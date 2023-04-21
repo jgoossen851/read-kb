@@ -8,11 +8,13 @@ INPUT_PIPE="${1}"
 tail -f "${INPUT_PIPE}" | while read KEY_NAME; do
 
   case "${KEY_NAME}" in
+    # Define an exit command to receive through the pipe
+    'SIGINT')   exit ;;
+    # Process output of read-kb program
     'Down')     echo D ;;
     'Up')       echo U ;;
     'Left')     echo L ;;
     'Right')    echo R ;;
-    'EOT')      echo End ;;
     *)          echo -n "<${KEY_NAME}>";;
   esac
 

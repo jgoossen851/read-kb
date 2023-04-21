@@ -4,25 +4,19 @@ SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
 TEMP_DIR="/tmp/read-kb"
 DAEMON_SCRIPT="daemon.sh"
 
-echo "Press 'Ctrl-C' to quit."
-# Define cleanup routine
 cleanup() {
-  echo "SIGINT caught"
+  # Send command through pipe to shutdown
+  echo 'SIGINT' > "${TEMP_DIR}/ipipe"
 
-  echo -n "Removing named pipe ..."
+  # Delete all temp files
   rm -rf "${TEMP_DIR}"
-  echo "Done."
-
-  echo "Killing background daemon processes ..."
-  for ind in $(pgrep "${DAEMON_SCRIPT}"); do
-    ps $ind
-    sudo kill -9 $ind
-  done
-  echo "Done."
 
   exit
 }
-trap 'cleanup' SIGINT
+# Run cleanup on any exit
+trap 'cleanup' EXIT
+
+echo "Press 'Ctrl-C' to quit."
 
 # Create a pipe for input to the daemon
 mkdir -p "${TEMP_DIR}"
