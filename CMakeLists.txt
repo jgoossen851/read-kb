@@ -4,7 +4,14 @@
 #
 # Copyright (c) 2023, Jeremy Goossen jeremyg995@gmail.com
 
-cmake_minimum_required(VERSION 3.5.1)
+cmake_minimum_required(VERSION 3.9)
 
-# Set the CMake target name and files for this subdirectory
-install(PROGRAMS read-kb.sh DESTINATION bin RENAME read-kb)
+project(read-kb
+        VERSION 0.1.0
+        DESCRIPTION "Single-key keyboard reader for interactive program input"
+        )
+
+install(PROGRAMS src/read-kb.sh
+        DESTINATION bin
+        RENAME "${PROJECT_NAME}"
+        )
