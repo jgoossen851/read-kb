@@ -18,7 +18,7 @@
 #include <cstring>
 
 // use `tail -f "/tmp/read-kb-debug-log.txt"` from a terminal to see debug messages
-#define DEBUG 0
+#define DEBUG 1
 
 #define errorExit(msg)  do { perror(msg); exit(EXIT_FAILURE); \
                            } while (0)
@@ -44,6 +44,7 @@ static std::map<std::string, COMMANDS> InitializeMap();
 
 int main(int argc, char* argv[]) {
 
+  // Initialize debugging log file
   #if DEBUG == 1
     FILE* pDebugLogFile;
     pDebugLogFile = fopen ("/tmp/read-kb-debug-log.txt", "w");
@@ -70,7 +71,6 @@ int main(int argc, char* argv[]) {
   if (pfds[0].fd == -1) {
       errorExit("open");
   }
-
   printlog("Opened \"%s\" on fd %d\n", argv[1], pfds[0].fd);
 
   // Request poll() to scan file descriptor for data available to read (POLLIN signal)
@@ -90,35 +90,39 @@ int main(int argc, char* argv[]) {
   while(true) {
     int num_ready;
 
-    // printf("About to poll()\n");
+    printlog("Polling pipe for signal or data... ");
     num_ready = poll(pfds, 1, -1);
     if (num_ready == -1) {
       errorExit("poll");
     }
-
-    // printf("Ready: %d\n", num_ready);
+    printlog("Pipes ready: %d\n", num_ready);
 
     // Deal with array returned by poll()
-
     {
+      // Read from pipe one buffer-length at a time
       char buf[10];
 
       if (pfds[0].revents != 0) {
-        // printf("  fd=%d; events: %s%s%s\n", pfds[0].fd,
-        //     (pfds[0].revents & POLLIN)  ? "POLLIN "  : "",
-        //     (pfds[0].revents & POLLHUP) ? "POLLHUP " : "",
-        //     (pfds[0].revents & POLLERR) ? "POLLERR " : "");
+
+        // Log signals (events) found by poll
+        printlog("  fd=%d; events: %s%s%s%s\n", pfds[0].fd,
+            (pfds[0].revents & POLLIN)   ? "\e[32mPOLLIN\e[0m "   : "",
+            (pfds[0].revents & POLLHUP)  ? "\e[33mPOLLHUP\e[0m "  : "",
+            (pfds[0].revents & POLLERR)  ? "\e[31mPOLLERR\e[0m "  : "",
+            (pfds[0].revents & POLLNVAL) ? "\e[31mPOLLNVAL\e[0m " : "");
 
         if (pfds[0].revents & POLLIN) {
+          // Read from the pipe if there is data available (POLLIN)
+
           ssize_t s = read(pfds[0].fd, buf, sizeof(buf));
           if (s == -1) {
             errorExit("read");
           }
-          if (s != 0) {
-            printlog("    read %zd bytes: %.*s\n",
-                   s, (int) s, buf);
-          }
-        } else {                /* POLLERR | POLLHUP */
+          printlog("    read %zd bytes: \e[1m%.*s\e[0m\n", s, (int) s, buf);
+
+        } else {
+          // Process other signals (POLLERR | POLLHUP | POLLNVALPOLLNVAL)
+
           printlog("    closing fd %d\n", pfds[0].fd);
           if (close(pfds[0].fd) == -1) {
             errorExit("close");
