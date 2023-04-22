@@ -9,7 +9,7 @@ CPP_DAEMON="../build/examples/read-kb-example-daemon"
 cleanup() {
   # Send command through pipe to shutdown
   echo 'SIGINT' > "${TEMP_DIR}/ipipe_bash"
-  # echo 'SIGINT' > "${TEMP_DIR}/ipipe_cpp"
+  echo 'SIGINT' > "${TEMP_DIR}/ipipe_cpp"
 
   # Delete all temp files
   rm -rf "${TEMP_DIR}"
@@ -43,13 +43,13 @@ if [ ! -f "${SCRIPT_DIR}/${CPP_DAEMON}" ]; then
   echo "${SCRIPT_DIR}/${CPP_DAEMON}" could not be found
   exit
 fi
-# "${SCRIPT_DIR}/${CPP_DAEMON}"  "${TEMP_DIR}/ipipe_cpp" &
-"${SCRIPT_DIR}/${CPP_DAEMON}"  "text.txt" &
+"${SCRIPT_DIR}/${CPP_DAEMON}"  "${TEMP_DIR}/ipipe_cpp" &
+# "${SCRIPT_DIR}/${CPP_DAEMON}"  "text.txt" &
 
 
 while true; do
   # Send keyboard events to the pipe
   KEY="$(read-kb 2>/dev/null)"
   echo "${KEY}" > "${TEMP_DIR}/ipipe_bash"
-  # echo "${KEY}" > "${TEMP_DIR}/ipipe_cpp"
+  echo "${KEY}" > "${TEMP_DIR}/ipipe_cpp"
 done

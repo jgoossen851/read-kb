@@ -6,7 +6,7 @@ Single-key keyboard reader for interactive program input
 
 ```bash
 cmake -S . -B build/                   # Generate build directory and configure project
-cmake --build build/ --targets install # Install program
+cmake --build build/ --target install  # Install program
 ```
 
 Making the `install` target installs the following:
