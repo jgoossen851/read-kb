@@ -6,19 +6,30 @@
  */
 
 #include <iostream>
+#include <cstdio>
 #include <fstream>
 #include <string>
 #include <map>
 #include <poll.h>
 #include <fcntl.h>
 #include <sys/types.h>
-#include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
 #include <cstring>
 
+// use `tail -f "/tmp/read-kb-debug-log.txt"` from a terminal to see debug messages
+#define DEBUG 0
+
 #define errorExit(msg)  do { perror(msg); exit(EXIT_FAILURE); \
                            } while (0)
+
+#if DEBUG == 0
+#   define printlog(...)   do {} while (0)
+#else
+#   define printlog(...)   do { fprintf(pDebugLogFile, __VA_ARGS__); \
+                                fseek(pDebugLogFile, 0, SEEK_END); \
+                              } while (0)
+#endif
 
 enum COMMANDS {
   NOT_DEFINED,
@@ -32,6 +43,11 @@ enum COMMANDS {
 static std::map<std::string, COMMANDS> InitializeMap();
 
 int main(int argc, char* argv[]) {
+
+  #if DEBUG == 1
+    FILE* pDebugLogFile;
+    pDebugLogFile = fopen ("/tmp/read-kb-debug-log.txt", "w");
+  #endif
 
   // Check that a single argument was given
   if (argc != 2) {
@@ -55,7 +71,7 @@ int main(int argc, char* argv[]) {
       errorExit("open");
   }
 
-  printf("Opened \"%s\" on fd %d\n", argv[1], pfds[0].fd);
+  printlog("Opened \"%s\" on fd %d\n", argv[1], pfds[0].fd);
 
   // Request poll() to scan file descriptor for data available to read (POLLIN signal)
   pfds[0].events = POLLIN;
@@ -99,11 +115,11 @@ int main(int argc, char* argv[]) {
             errorExit("read");
           }
           if (s != 0) {
-            printf("    read %zd bytes: %.*s\n",
+            printlog("    read %zd bytes: %.*s\n",
                    s, (int) s, buf);
           }
         } else {                /* POLLERR | POLLHUP */
-          printf("    closing fd %d\n", pfds[0].fd);
+          printlog("    closing fd %d\n", pfds[0].fd);
           if (close(pfds[0].fd) == -1) {
             errorExit("close");
           }
@@ -134,7 +150,7 @@ int main(int argc, char* argv[]) {
 
   }
 
-  printf("All file descriptors closed; bye\n");
+  printlog("All file descriptors closed; bye\n");
 
   return 0;
 }
