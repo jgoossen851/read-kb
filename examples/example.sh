@@ -11,6 +11,9 @@ cleanup() {
   # Send command through pipe to shutdown
   echo 'SIGINT' > "${TEMP_DIR}/ipipe"
 
+  # Close pipe (stop redirecting fd 3 to named fifo pipe)
+  exec 3>&-
+
   # Delete all temp files
   rm -rf "${TEMP_DIR}"
 
@@ -34,7 +37,15 @@ if [ ! -f "${SCRIPT_DIR}/${DAEMON}" ]; then
   echo "${SCRIPT_DIR}/${DAEMON}" could not be found
   exit
 fi
+# Daemon will halt when trying to read from pipe until pipe is also opened for writing
 "${SCRIPT_DIR}/${DAEMON}" "${TEMP_DIR}/ipipe" &
+
+
+# Open pipe for writing (redirect fd 3 to named fifo pipe)
+echo -n "Opening pipe for writing. Waiting for daemon to attach... "
+# This program will halt until the daemon also opens pipe for reading
+exec 3> "${TEMP_DIR}/ipipe"
+echo "Done."
 
 
 while true; do

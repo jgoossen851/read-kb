@@ -5,7 +5,7 @@
 INPUT_PIPE="${1}"
 
 # Read from input pipe
-tail -f "${INPUT_PIPE}" | while read KEY_NAME; do
+while read KEY_NAME; do
 
   case "${KEY_NAME}" in
     # Define an exit command to receive through the pipe
@@ -18,4 +18,4 @@ tail -f "${INPUT_PIPE}" | while read KEY_NAME; do
     *)          echo -n "<${KEY_NAME}>";;
   esac
 
-done
+done < "${INPUT_PIPE}"
