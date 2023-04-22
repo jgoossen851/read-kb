@@ -43,25 +43,23 @@ int main(int argc, char* argv[]) {
   std::map<std::string, COMMANDS> dictionary = InitializeMap();
 
   // Get file descriptors for the poll command
-  int nfds, num_open_fds;
   struct pollfd *pfds;
-  num_open_fds = nfds = argc - 1; // Number of file descriptors
-  pfds = static_cast<pollfd*>(calloc(nfds, sizeof(struct pollfd)));
+  pfds = static_cast<pollfd*>(calloc(1, sizeof(struct pollfd)));
   if (pfds == NULL) {
     errorExit("malloc");
   }
 
   // Open each file, and add it to 'pfds' array
-  for (int jj = 0; jj < nfds; jj++) {
-    pfds[jj].fd = open(argv[jj + 1], O_RDONLY);
-    if (pfds[jj].fd == -1) {
+  pfds[0].fd = open(argv[1], O_RDONLY);
+  if (pfds[0].fd == -1) {
       errorExit("open");
-    }
-
-    printf("Opened \"%s\" on fd %d\n", argv[jj + 1], pfds[jj].fd);
-
-    pfds[jj].events = POLLIN;
   }
+
+  printf("Opened \"%s\" on fd %d\n", argv[1], pfds[0].fd);
+
+  // Request poll() to scan file descriptor for data available to read (POLLIN signal)
+  pfds[0].events = POLLIN;
+  
 
 
 
@@ -73,30 +71,30 @@ int main(int argc, char* argv[]) {
  
  
   // Keep calling poll() as long as at least one file descriptor is open.
-  while(num_open_fds > 0) {
-    int ready;
+  while(true) {
+    int num_ready;
 
     // printf("About to poll()\n");
-    ready = poll(pfds, nfds, -1);
-    if (ready == -1) {
+    num_ready = poll(pfds, 1, -1);
+    if (num_ready == -1) {
       errorExit("poll");
     }
 
-    // printf("Ready: %d\n", ready);
+    // printf("Ready: %d\n", num_ready);
 
     // Deal with array returned by poll()
 
-    for (int j = 0; j < nfds; j++) {
+    {
       char buf[10];
 
-      if (pfds[j].revents != 0) {
-        // printf("  fd=%d; events: %s%s%s\n", pfds[j].fd,
-        //     (pfds[j].revents & POLLIN)  ? "POLLIN "  : "",
-        //     (pfds[j].revents & POLLHUP) ? "POLLHUP " : "",
-        //     (pfds[j].revents & POLLERR) ? "POLLERR " : "");
+      if (pfds[0].revents != 0) {
+        // printf("  fd=%d; events: %s%s%s\n", pfds[0].fd,
+        //     (pfds[0].revents & POLLIN)  ? "POLLIN "  : "",
+        //     (pfds[0].revents & POLLHUP) ? "POLLHUP " : "",
+        //     (pfds[0].revents & POLLERR) ? "POLLERR " : "");
 
-        if (pfds[j].revents & POLLIN) {
-          ssize_t s = read(pfds[j].fd, buf, sizeof(buf));
+        if (pfds[0].revents & POLLIN) {
+          ssize_t s = read(pfds[0].fd, buf, sizeof(buf));
           if (s == -1) {
             errorExit("read");
           }
@@ -105,11 +103,11 @@ int main(int argc, char* argv[]) {
                    s, (int) s, buf);
           }
         } else {                /* POLLERR | POLLHUP */
-        //   printf("    closing fd %d\n", pfds[j].fd);
-        //   if (close(pfds[j].fd) == -1) {
-        //     errorExit("close");
-        //   }
-        //   num_open_fds--;
+          printf("    closing fd %d\n", pfds[0].fd);
+          if (close(pfds[0].fd) == -1) {
+            errorExit("close");
+          }
+          break;
         }
       }
     }
