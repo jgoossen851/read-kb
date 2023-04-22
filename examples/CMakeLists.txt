@@ -6,14 +6,6 @@
 
 cmake_minimum_required(VERSION 3.9)
 
-project(read-kb
-        VERSION 0.1.0
-        DESCRIPTION "Single-key keyboard reader for interactive program input"
-        )
-
-install(PROGRAMS src/read-kb.sh
-        DESTINATION bin
-        RENAME "${PROJECT_NAME}"
-        )
-
-add_subdirectory(examples)
+add_executable(read-kb-example-daemon
+    main.cpp
+)
