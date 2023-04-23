@@ -11,10 +11,11 @@ while read KEY_NAME; do
     # Define an exit command to receive through the pipe
     'SIGINT')   exit ;;
     # Process output of read-kb program
-    'Down')     echo D ;;
-    'Up')       echo U ;;
-    'Left')     echo L ;;
-    'Right')    echo R ;;
+    'h')        echo "Help" ;;
+    'Up')       echo -en "\e[A" ;;
+    'Down')     echo -en "\e[B" ;;
+    'Right')    echo -en "\e[C" ;;
+    'Left')     echo -en "\e[D" ;;
     *)          echo -n "<${KEY_NAME}>";;
   esac
 

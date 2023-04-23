@@ -18,7 +18,7 @@
 #include <cstring>
 
 // use `tail -f "/tmp/read-kb-debug-log.txt"` from a terminal to see debug messages
-#define DEBUG 1
+#define DEBUG 0
 
 #define errorExit(msg)  do { perror(msg); exit(EXIT_FAILURE); \
                            } while (0)
@@ -36,7 +36,9 @@ enum COMMANDS {
   EXIT_CODE,
   HELP,
   UP,
-  DOWN
+  DOWN,
+  FORWARD,
+  BACK
 };
 
 // Initialization function for command map
@@ -140,10 +142,16 @@ int main(int argc, char* argv[]) {
         std::cout << "Help" << std::endl;
         break;
     case UP :
-        std::cout << "^" << std::endl;
+        std::cout << "\e[A" << std::flush;
         break;
     case DOWN :
-        std::cout << "v" << std::endl;
+        std::cout << "\e[B" << std::flush;
+        break;
+    case FORWARD :
+        std::cout << "\e[C" << std::flush;
+        break;
+    case BACK :
+        std::cout << "\e[D" << std::flush;
         break;
     default :
         std::cout << "(" << key_pressed << ")" << std::flush;
@@ -165,6 +173,8 @@ std::map<std::string, COMMANDS> InitializeMap(){
   dictionary["h"]       = HELP;
   dictionary["Up"]      = UP;
   dictionary["Down"]    = DOWN;
+  dictionary["Right"]   = FORWARD;
+  dictionary["Left"]    = BACK;
 
   return dictionary;
 }
