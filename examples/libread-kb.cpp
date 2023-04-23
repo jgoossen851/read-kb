@@ -19,12 +19,22 @@
 
 #include "libread-kb.h"
 
+#if DEBUG_LIB_READ_KB == 0
+#   define printlog(...)   do {} while (0)
+#else
+#   define printlog(...)   do { fprintf(g_pDebugLogFile, __VA_ARGS__); \
+                                fseek(g_pDebugLogFile, 0, SEEK_END); \
+                              } while (0)
+#endif
+
+#if DEBUG_LIB_READ_KB == 1
+  FILE* g_pDebugLogFile;
+#endif
 
 struct pollfd* setup_readkb(char* pipe) {
   // Initialize debugging log file
   #if DEBUG_LIB_READ_KB == 1
-    FILE* pDebugLogFile;
-    pDebugLogFile = fopen ("/tmp/read-kb-debug-log.txt", "w");
+    g_pDebugLogFile = fopen ("/tmp/read-kb-debug-log.txt", "w");
   #endif
 
   // Get file descriptors for the poll command
@@ -39,7 +49,7 @@ struct pollfd* setup_readkb(char* pipe) {
   if (pfds[0].fd == -1) {
       errorExit("open");
   }
-  printlog("Opened \"%s\" on fd %d\n", argv[1], pfds[0].fd);
+  printlog("Opened \"%s\" on fd %d\n", pipe, pfds[0].fd);
 
   // Request poll() to scan file descriptor for data available to read (POLLIN signal)
   pfds[0].events = POLLIN;
@@ -87,13 +97,17 @@ std::string getChar_readkb(struct pollfd* pfds) {
       } else {
         // Process other signals (POLLERR | POLLHUP | POLLNVAL)
 
-        printlog("    closing fd %d\n", pfds[0].fd);
-        if (close(pfds[0].fd) == -1) {
-          errorExit("close");
-        }
+        close_readkb(pfds);
         key_pressed.assign("SIGINT");
       }
     }
   }
   return key_pressed;
+}
+
+void close_readkb(struct pollfd* pfds) {
+  printlog("    closing fd %d\n", pfds[0].fd);
+  if (close(pfds[0].fd) == -1) {
+    errorExit("close");
+  }
 }

@@ -5,6 +5,9 @@
  * Copyright (c) 2023, Jeremy Goossen jeremyg995@gmail.com
  */
 
+#ifndef LIBREAD_KB_H
+#define LIBREAD_KB_H
+
 // #include <cstdio>
 // #include <fstream>
 // #include <string>
@@ -16,19 +19,15 @@
 // #include <unistd.h>
 // #include <cstring>
 
+
 // use `tail -f "/tmp/read-kb-debug-log.txt"` from a terminal to see debug messages
 #define DEBUG_LIB_READ_KB 0
 
 #define errorExit(msg)  do { perror(msg); exit(EXIT_FAILURE); \
                            } while (0)
 
-#if DEBUG_LIB_READ_KB == 0
-#   define printlog(...)   do {} while (0)
-#else
-#   define printlog(...)   do { fprintf(pDebugLogFile, __VA_ARGS__); \
-                                fseek(pDebugLogFile, 0, SEEK_END); \
-                              } while (0)
-#endif
+struct pollfd*  setup_readkb(char* pipe);
+std::string     getChar_readkb(struct pollfd* pfds);
+void            close_readkb(struct pollfd* pfds);
 
-struct pollfd* setup_readkb(char* pipe);
-std::string getChar_readkb(struct pollfd* pfds);
+#endif // LIBREAD_KB_H

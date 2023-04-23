@@ -57,10 +57,7 @@ int main(int argc, char* argv[]) {
 
     switch (dictionary[key_pressed]) {
     case EXIT_CODE : // Exit Condition
-        printlog("    processing exit condition and closing fd %d\n", pfds[0].fd);
-        if (close(pfds[0].fd) == -1) {
-          errorExit("close");
-        }
+        close_readkb(pfds);
         keep_reading = false;
         break;
     case HELP : // Print Usage
@@ -83,8 +80,6 @@ int main(int argc, char* argv[]) {
     }
 
   }
-
-  printlog("All file descriptors closed; bye\n");
 
   return 0;
 }
