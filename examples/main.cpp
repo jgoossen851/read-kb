@@ -41,6 +41,33 @@ enum COMMANDS {
   BACK
 };
 
+struct pollfd* setup_readkb(char* pipe) {
+  // Initialize debugging log file
+  #if DEBUG == 1
+    FILE* pDebugLogFile;
+    pDebugLogFile = fopen ("/tmp/read-kb-debug-log.txt", "w");
+  #endif
+
+  // Get file descriptors for the poll command
+  struct pollfd *pfds;
+  pfds = static_cast<pollfd*>(calloc(1, sizeof(struct pollfd)));
+  if (pfds == NULL) {
+    errorExit("malloc");
+  }
+
+  // Open each file, and add it to 'pfds' array
+  pfds[0].fd = open(pipe, O_RDONLY);
+  if (pfds[0].fd == -1) {
+      errorExit("open");
+  }
+  printlog("Opened \"%s\" on fd %d\n", argv[1], pfds[0].fd);
+
+  // Request poll() to scan file descriptor for data available to read (POLLIN signal)
+  pfds[0].events = POLLIN;
+
+  return pfds;
+}
+
 std::string getChar_readkb(struct pollfd* pfds) {
   int num_ready;
   std::string key_pressed;
@@ -97,12 +124,6 @@ static std::map<std::string, COMMANDS> InitializeMap();
 
 int main(int argc, char* argv[]) {
 
-  // Initialize debugging log file
-  #if DEBUG == 1
-    FILE* pDebugLogFile;
-    pDebugLogFile = fopen ("/tmp/read-kb-debug-log.txt", "w");
-  #endif
-
   // Check that a single argument was given
   if (argc != 2) {
     std::cerr << argv[0] << " requires a single argument containing the input pipe." << std::endl;
@@ -112,28 +133,14 @@ int main(int argc, char* argv[]) {
   // Initialize the command map
   std::map<std::string, COMMANDS> dictionary = InitializeMap();
 
-  // Get file descriptors for the poll command
-  struct pollfd *pfds;
-  pfds = static_cast<pollfd*>(calloc(1, sizeof(struct pollfd)));
-  if (pfds == NULL) {
-    errorExit("malloc");
-  }
-
-  // Open each file, and add it to 'pfds' array
-  pfds[0].fd = open(argv[1], O_RDONLY);
-  if (pfds[0].fd == -1) {
-      errorExit("open");
-  }
-  printlog("Opened \"%s\" on fd %d\n", argv[1], pfds[0].fd);
-
-  // Request poll() to scan file descriptor for data available to read (POLLIN signal)
-  pfds[0].events = POLLIN;
-  
-  std::string key_pressed;
+  // Initialize the keyboard input
+  struct pollfd *pfds = setup_readkb(argv[1]);
  
   // Keep calling poll() as long as at least one file descriptor is open.
+  std::string key_pressed;
   bool keep_reading = true;
   while(keep_reading) {
+
     key_pressed = getChar_readkb(pfds);
 
     switch (dictionary[key_pressed]) {
