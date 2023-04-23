@@ -5,17 +5,10 @@
  * Copyright (c) 2023, Jeremy Goossen jeremyg995@gmail.com
  */
 
-#include <iostream>
-#include <cstdio>
-#include <fstream>
 #include <string>
 #include <map>
+#include <iostream>
 #include <poll.h>
-#include <fcntl.h>
-#include <sys/types.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include <cstring>
 
 #include "libread-kb.h"
 

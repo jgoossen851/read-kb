@@ -8,17 +8,9 @@
 #ifndef LIBREAD_KB_H
 #define LIBREAD_KB_H
 
-// #include <cstdio>
-// #include <fstream>
-// #include <string>
-// #include <map>
-// #include <poll.h>
-// #include <fcntl.h>
-// #include <sys/types.h>
-// #include <stdlib.h>
-// #include <unistd.h>
-// #include <cstring>
-
+#include <string>
+#include <cstdio>
+#include <poll.h>
 
 // use `tail -f "/tmp/read-kb-debug-log.txt"` from a terminal to see debug messages
 #define DEBUG_LIB_READ_KB 0

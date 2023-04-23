@@ -5,17 +5,12 @@
  * Copyright (c) 2023, Jeremy Goossen jeremyg995@gmail.com
  */
 
-#include <iostream>
-#include <cstdio>
-#include <fstream>
 #include <string>
-#include <map>
+#include <cstdio>
 #include <poll.h>
+#include <fstream>
 #include <fcntl.h>
-#include <sys/types.h>
-#include <stdlib.h>
 #include <unistd.h>
-#include <cstring>
 
 #include "libread-kb.h"
 
@@ -92,7 +87,6 @@ std::string getChar_readkb(struct pollfd* pfds) {
         printlog("    read %zd bytes: \e[1m%.*s\e[0m\n", s, (int) s, buf);
 
         key_pressed.assign(buf, s-1);
-      //   std::cout << "(" << key_pressed << ")" << std::flush;
 
       } else {
         // Process other signals (POLLERR | POLLHUP | POLLNVAL)
