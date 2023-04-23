@@ -76,18 +76,11 @@ int main(int argc, char* argv[]) {
   // Request poll() to scan file descriptor for data available to read (POLLIN signal)
   pfds[0].events = POLLIN;
   
-
-
-
-//   std::fstream fs;
-//   std::string input;
-//   fs.open(argv[1], std::fstream::in);
-// //   while(std::getline(fs, input)) { // quit the program with Ctrl+D (EOF) or Ctrl+C (SIGINT)
- 
- 
+  std::string key_pressed;
  
   // Keep calling poll() as long as at least one file descriptor is open.
-  while(true) {
+  bool keep_reading = true;
+  while(keep_reading) {
     int num_ready;
 
     printlog("Polling pipe for signal or data... ");
@@ -100,7 +93,7 @@ int main(int argc, char* argv[]) {
     // Deal with array returned by poll()
     {
       // Read from pipe one buffer-length at a time
-      char buf[10];
+      char buf[27]; // Longest name is "Shft-Ctrl-Alt-NumpadCenter"
 
       if (pfds[0].revents != 0) {
 
@@ -120,8 +113,11 @@ int main(int argc, char* argv[]) {
           }
           printlog("    read %zd bytes: \e[1m%.*s\e[0m\n", s, (int) s, buf);
 
+          key_pressed.assign(buf, s-1);
+        //   std::cout << "(" << key_pressed << ")" << std::flush;
+
         } else {
-          // Process other signals (POLLERR | POLLHUP | POLLNVALPOLLNVAL)
+          // Process other signals (POLLERR | POLLHUP | POLLNVAL)
 
           printlog("    closing fd %d\n", pfds[0].fd);
           if (close(pfds[0].fd) == -1) {
@@ -132,25 +128,26 @@ int main(int argc, char* argv[]) {
       }
     }
 
-
-
-    // switch (dictionary[input]) {
-    // case EXIT_CODE : // Exit Condition
-    //     fs.close();
-    //     return 0;
-    //     break;
-    // case HELP : // Print Usage
-    //     std::cout << "Help" << std::endl;
-    //     break;
-    // case UP :
-    //     std::cout << "^" << std::endl;
-    //     break;
-    // case DOWN :
-    //     std::cout << "v" << std::endl;
-    //     break;
-    // default :
-    //     std::cout << "(" << input << ")" << std::endl; 
-    // }
+    switch (dictionary[key_pressed]) {
+    case EXIT_CODE : // Exit Condition
+        printlog("    processing exit condition and closing fd %d\n", pfds[0].fd);
+        if (close(pfds[0].fd) == -1) {
+          errorExit("close");
+        }
+        keep_reading = false;
+        break;
+    case HELP : // Print Usage
+        std::cout << "Help" << std::endl;
+        break;
+    case UP :
+        std::cout << "^" << std::endl;
+        break;
+    case DOWN :
+        std::cout << "v" << std::endl;
+        break;
+    default :
+        std::cout << "(" << key_pressed << ")" << std::flush;
+    }
 
   }
 
