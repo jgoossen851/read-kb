@@ -13,9 +13,9 @@ function nameChar {
     $'\x05' ) echo "ENQ"        ;; # ENQ
     $'\x06' ) echo "ACK"        ;; # ACK
     $'\a'   ) echo "BEL"        ;; # BEL
-    $'\b'   ) echo "Ctrl-Bksp"  ;; # BS
-    $'\t'   ) echo "Tab"        ;; # HT
-    ''      ) echo "Enter"      ;; # LF
+    $'\b'   ) echo "BS"         ;; # BS
+    $'\t'   ) echo "HT"         ;; # HT
+    ''      ) echo "LF"         ;; # LF
     $'\v'   ) echo "VT"         ;; # VT
     $'\f'   ) echo "FF"         ;; # FF
     $'\r'   ) echo "CR"         ;; # CR
@@ -37,7 +37,7 @@ function nameChar {
     $'\x1d' ) echo "GS"         ;; # GS
     $'\x1e' ) echo "RS"         ;; # RS
     $'\x1f' ) echo "US"         ;; # US
-    $'\x7f' ) echo "Bksp"       ;; # DEL
+    $'\x7f' ) echo "DEL"        ;; # DEL
     *       ) echo "${char}"    ;; # Printable
   esac
 }
@@ -46,7 +46,7 @@ function nameEscSeq {
   local MODE
   read -rsn1 -t 0.01 MODE # Get 1 more character, if available
   case ${MODE} in
-    '')   echo "Esc" ;;
+    '')   echo "ESC" ;;
     '[')                # SGR Sequences
           read -rst 0.01 MODE # Get remaining characters, if available
           case ${MODE} in
