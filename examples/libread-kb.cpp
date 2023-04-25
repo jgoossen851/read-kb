@@ -22,6 +22,11 @@
                               } while (0)
 #endif
 
+// Define error-handling function
+#define errorIf(cond, msg) do { if( cond ) { \
+                                  perror(msg); exit(EXIT_FAILURE); \
+                              }} while (0)
+
 #define STDIN_FD 0 // Standard input file descriptor
 
 #if DEBUG_LIB_READ_KB == 1
@@ -37,15 +42,11 @@ struct pollfd* setup_readkb(void) {
   // Get file descriptors for the poll command
   struct pollfd *pfds;
   pfds = static_cast<pollfd*>(calloc(1, sizeof(struct pollfd)));
-  if (pfds == NULL) {
-    errorExit("malloc");
-  }
+  errorIf(pfds == NULL, "malloc");
 
   // Open each file, and add it to 'pfds' array
   pfds[0].fd = STDIN_FD;
-  if (pfds[0].fd == -1) {
-      errorExit("open");
-  }
+  errorIf(pfds[0].fd == -1, "open");
   printlog("Opened \"%s\" on fd %d\n", "stdin", pfds[0].fd);
 
   // Request poll() to scan file descriptor for data available to read (POLLIN signal)
@@ -60,9 +61,7 @@ std::string getChar_readkb(struct pollfd* pfds) {
 
   printlog("Polling pipe for signal or data... ");
   num_ready = poll(pfds, 1, -1);
-  if (num_ready == -1) {
-    errorExit("poll");
-  }
+  errorIf(num_ready == -1, "poll");
   printlog("Pipes ready: %d\n", num_ready);
 
   // Deal with array returned by poll()
@@ -83,9 +82,7 @@ std::string getChar_readkb(struct pollfd* pfds) {
         // Read from the pipe if there is data available (POLLIN)
 
         ssize_t s = read(pfds[0].fd, buf, sizeof(buf));
-        if (s == -1) {
-          errorExit("read");
-        }
+        errorIf(s == -1, "read");
         printlog("    read %zd bytes: \e[1m%.*s\e[0m\n", s, (int) s, buf);
 
         key_pressed.assign(buf, s-1);
@@ -103,7 +100,5 @@ std::string getChar_readkb(struct pollfd* pfds) {
 
 void close_readkb(struct pollfd* pfds) {
   printlog("    closing fd %d\n", pfds[0].fd);
-  if (close(pfds[0].fd) == -1) {
-    errorExit("close");
-  }
+  errorIf(close(pfds[0].fd) == -1, "close");
 }
