@@ -6,38 +6,38 @@
 function nameChar {
   local char=${1:-""}
   case ${char} in
-    $'\x01' ) echo "SOH"        ;; # SOH
-    $'\x02' ) echo "STX"        ;; # STX
-    $'\x03' ) echo "ETX"        ;; # ETX
-    $'\x04' ) echo "EOT"        ;; # EOT
-    $'\x05' ) echo "ENQ"        ;; # ENQ
-    $'\x06' ) echo "ACK"        ;; # ACK
-    $'\a'   ) echo "BEL"        ;; # BEL
-    $'\b'   ) echo "BS"         ;; # BS
-    $'\t'   ) echo "HT"         ;; # HT
-    ''      ) echo "LF"         ;; # LF
-    $'\v'   ) echo "VT"         ;; # VT
-    $'\f'   ) echo "FF"         ;; # FF
-    $'\r'   ) echo "CR"         ;; # CR
-    $'\x0e' ) echo "SO"         ;; # SO
-    $'\x0f' ) echo "SI"         ;; # SI
-    $'\x10' ) echo "DLE"        ;; # DLE
-    $'\x11' ) echo "DC1"        ;; # DC1
-    $'\x12' ) echo "DC2"        ;; # DC2
-    $'\x13' ) echo "DC3"        ;; # DC3
-    $'\x14' ) echo "DC4"        ;; # DC4
-    $'\x15' ) echo "NAK"        ;; # NAK
-    $'\x16' ) echo "SYN"        ;; # SYN
-    $'\x17' ) echo "ETB"        ;; # ETB
-    $'\x18' ) echo "CAN"        ;; # CAN
-    $'\x19' ) echo "EM"         ;; # EM
-    $'\x1a' ) echo "SUB"        ;; # SUB
-    $'\x1b' ) nameEscSeq        ;; # ESC
-    $'\x1c' ) echo "FS"         ;; # FS
-    $'\x1d' ) echo "GS"         ;; # GS
-    $'\x1e' ) echo "RS"         ;; # RS
-    $'\x1f' ) echo "US"         ;; # US
-    $'\x7f' ) echo "DEL"        ;; # DEL
+    $'\x01' ) echo "SOH"        ;; # START OF HEADING
+    $'\x02' ) echo "STX"        ;; # START OF TEXT
+    $'\x03' ) echo "ETX"        ;; # END OF TEXT
+    $'\x04' ) echo "EOT"        ;; # END OF TRANSMISSION
+    $'\x05' ) echo "ENQ"        ;; # ENQUIRY
+    $'\x06' ) echo "ACK"        ;; # ACKNOWLEDGE
+    $'\a'   ) echo "BEL"        ;; # BELL (Beep)
+    $'\b'   ) echo "BS"         ;; # BACKSPACE (Ctrl-Bksp)
+    $'\t'   ) echo "HT"         ;; # HORIZONTAL TAB
+    ''      ) echo "LF"         ;; # LINE FEED
+    $'\v'   ) echo "VT"         ;; # VERTICAL TAB
+    $'\f'   ) echo "FF"         ;; # FORM FEED
+    $'\r'   ) echo "CR"         ;; # CARRIAGE RETURN
+    $'\x0e' ) echo "SO"         ;; # SHIFT OUT
+    $'\x0f' ) echo "SI"         ;; # SHIFT IN
+    $'\x10' ) echo "DLE"        ;; # DATA LINK ESCAPE
+    $'\x11' ) echo "DC1"        ;; # DEVICE CONTROL 1 (XON)
+    $'\x12' ) echo "DC2"        ;; # DEVICE CONTROL 2
+    $'\x13' ) echo "DC3"        ;; # DEVICE CONTROL 3 (XOFF)
+    $'\x14' ) echo "DC4"        ;; # DEVICE CONTROL 4
+    $'\x15' ) echo "NAK"        ;; # NEGATIVE ACKNOWLEDGE
+    $'\x16' ) echo "SYN"        ;; # SYNCHRONOUS IDLE
+    $'\x17' ) echo "ETB"        ;; # END OF TRANSMISSION BLOCK
+    $'\x18' ) echo "CAN"        ;; # CANCEL
+    $'\x19' ) echo "EM"         ;; # END OF MEDIUM
+    $'\x1a' ) echo "SUB"        ;; # SUBSTITUTE
+    $'\x1b' ) nameEscSeq        ;; # ESCAPE
+    $'\x1c' ) echo "FS"         ;; # FILE SEPARATOR
+    $'\x1d' ) echo "GS"         ;; # GROUP SEPARATOR
+    $'\x1e' ) echo "RS"         ;; # RECORD SEPARATOR
+    $'\x1f' ) echo "US"         ;; # UNIT SEPARATOR
+    $'\x7f' ) echo "DEL"        ;; # DELETE (Bksp)
     *       ) echo "${char}"    ;; # Printable
   esac
 }
