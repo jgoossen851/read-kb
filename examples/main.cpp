@@ -29,18 +29,12 @@ static std::map<std::string, COMMANDS> InitializeMap();
 
 int main(int argc, char* argv[]) {
 
-  // Check that a single argument was given
-  if (argc != 2) {
-    std::cerr << argv[0] << " requires a single argument containing the input pipe." << std::endl;
-    return 1;
-  }
-
   // Initialize the command map
   std::map<std::string, COMMANDS> dictionary = InitializeMap();
 
   // Initialize the keyboard input
-  struct pollfd *pfds = setup_readkb(argv[1]);
- 
+  struct pollfd *pfds = setup_readkb();
+
   // Keep calling poll() as long as at least one file descriptor is open.
   std::string key_pressed;
   bool keep_reading = true;

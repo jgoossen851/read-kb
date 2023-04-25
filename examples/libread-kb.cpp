@@ -22,11 +22,13 @@
                               } while (0)
 #endif
 
+#define STDIN_FD 0 // Standard input file descriptor
+
 #if DEBUG_LIB_READ_KB == 1
   FILE* g_pDebugLogFile;
 #endif
 
-struct pollfd* setup_readkb(char* pipe) {
+struct pollfd* setup_readkb(void) {
   // Initialize debugging log file
   #if DEBUG_LIB_READ_KB == 1
     g_pDebugLogFile = fopen ("/tmp/read-kb-debug-log.txt", "w");
@@ -40,11 +42,11 @@ struct pollfd* setup_readkb(char* pipe) {
   }
 
   // Open each file, and add it to 'pfds' array
-  pfds[0].fd = open(pipe, O_RDONLY);
+  pfds[0].fd = STDIN_FD;
   if (pfds[0].fd == -1) {
       errorExit("open");
   }
-  printlog("Opened \"%s\" on fd %d\n", pipe, pfds[0].fd);
+  printlog("Opened \"%s\" on fd %d\n", "stdin", pfds[0].fd);
 
   // Request poll() to scan file descriptor for data available to read (POLLIN signal)
   pfds[0].events = POLLIN;

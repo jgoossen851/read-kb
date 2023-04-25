@@ -38,7 +38,7 @@ if [ ! -f "${SCRIPT_DIR}/${DAEMON}" ]; then
   exit
 fi
 # Daemon will halt when trying to read from pipe until pipe is also opened for writing
-"${SCRIPT_DIR}/${DAEMON}" "${TEMP_DIR}/ipipe" &
+"${SCRIPT_DIR}/${DAEMON}" < "${TEMP_DIR}/ipipe" &
 
 
 # Open pipe for writing (redirect fd 3 to named fifo pipe)

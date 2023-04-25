@@ -2,8 +2,6 @@
 
 # This script is run by example.sh and is not intended to be run independetly
 
-INPUT_PIPE="${1}"
-
 # Read from input pipe
 while read KEY_NAME; do
 
@@ -19,4 +17,4 @@ while read KEY_NAME; do
     *)          echo -n "<${KEY_NAME}>";;
   esac
 
-done < "${INPUT_PIPE}"
+done

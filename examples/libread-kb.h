@@ -18,7 +18,7 @@
 #define errorExit(msg)  do { perror(msg); exit(EXIT_FAILURE); \
                            } while (0)
 
-struct pollfd*  setup_readkb(char* pipe);
+struct pollfd*  setup_readkb(void);
 std::string     getChar_readkb(struct pollfd* pfds);
 void            close_readkb(struct pollfd* pfds);
 
