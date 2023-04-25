@@ -2,8 +2,8 @@
 
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
 TEMP_DIR="/tmp/read-kb"
-BASH_DAEMON="daemon.sh"
-CPP_DAEMON="../build/examples/read-kb-example-daemon"
+BASH_DAEMON="read-kb-daemon-bash.sh"
+CPP_DAEMON="../build/examples/read-kb-daemon-cpp"
 DAEMON="${CPP_DAEMON}"
 
 

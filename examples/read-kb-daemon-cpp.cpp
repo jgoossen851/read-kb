@@ -5,6 +5,10 @@
  * Copyright (c) 2023, Jeremy Goossen jeremyg995@gmail.com
  */
 
+/* This program reads keynames on standard input and processes events
+ * based on the name received.
+ */
+
 #include <string>
 #include <map>
 #include <iostream>

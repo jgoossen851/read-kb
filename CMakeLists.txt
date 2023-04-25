@@ -16,6 +16,7 @@ install(PROGRAMS src/read-kb.sh
         RENAME "${PROJECT_NAME}"
         )
 
+# C++ library to interact with the read-kb executable
 add_library(libread-kb STATIC
             src/libread-kb.cpp
             )

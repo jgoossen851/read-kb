@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# This script is run by example.sh and is not intended to be run independetly
+# Read keynames on standard input and process events
 
 # Read from input pipe
 while read KEY_NAME; do
