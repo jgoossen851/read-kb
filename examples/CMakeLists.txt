@@ -6,15 +6,16 @@
 
 cmake_minimum_required(VERSION 3.9)
 
-add_library(libread-kb STATIC
-    libread-kb.cpp
-    libread-kb.h)
-
 add_executable(read-kb-example-daemon
-    main.cpp libread-kb.cpp
+                main.cpp
 )
+
+target_include_directories(read-kb-example-daemon PRIVATE
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../include/read-kb>
+        $<INSTALL_INTERFACE:include/read-kb>  # <prefix>/include/read-kb
+      )
 
 # Specify libraries or flags to use when linking a given target and/or its dependents
 target_link_libraries(read-kb-example-daemon
-    INTERFACE libread-kb
+    PRIVATE libread-kb
 )

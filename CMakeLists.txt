@@ -16,4 +16,13 @@ install(PROGRAMS src/read-kb.sh
         RENAME "${PROJECT_NAME}"
         )
 
+add_library(libread-kb STATIC
+            src/libread-kb.cpp
+            )
+
+target_include_directories(libread-kb PUBLIC
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/read-kb>
+        $<INSTALL_INTERFACE:include/read-kb>  # <prefix>/include/read-kb
+      )
+
 add_subdirectory(examples)
