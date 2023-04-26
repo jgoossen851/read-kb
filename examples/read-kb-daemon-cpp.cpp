@@ -30,7 +30,7 @@ enum COMMANDS {
 // Initialization function for command map
 static std::map<std::string, COMMANDS> InitializeMap();
 
-int main(int argc, char* argv[]) {
+int main() {
 
   // Initialize the command map and keyboard input
   auto dictionary = InitializeMap();
@@ -48,10 +48,10 @@ int main(int argc, char* argv[]) {
       case HELP : // Print Usage
         std::cout << "Help" << std::endl;
         break;
-      case UP :       std::cout << "\e[A" << std::flush;  break;
-      case DOWN :     std::cout << "\e[B" << std::flush;  break;
-      case FORWARD :  std::cout << "\e[C" << std::flush;  break;
-      case BACK :     std::cout << "\e[D" << std::flush;  break;
+      case UP :       std::cout << "\033[A" << std::flush;  break;
+      case DOWN :     std::cout << "\033[B" << std::flush;  break;
+      case FORWARD :  std::cout << "\033[C" << std::flush;  break;
+      case BACK :     std::cout << "\033[D" << std::flush;  break;
       default :
         std::cout << "(" << key_pressed << ")" << std::flush;
     }

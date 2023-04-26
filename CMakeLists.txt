@@ -11,6 +11,19 @@ project(read-kb
         DESCRIPTION "Single-key keyboard reader for interactive program input"
         )
 
+# Set platform dependent compiler/linker flags
+if (MSVC)
+  # Warning level 4
+  add_compile_options(/W4)
+  # All warnings as errors
+  add_compile_options(/WX)
+else()
+  # Lots of warnings
+  add_compile_options(-Wall -Wextra -pedantic)
+  # All warnings as errors
+  add_compile_options(-Werror)
+endif()
+
 install(PROGRAMS src/read-kb.sh
         DESTINATION bin
         RENAME "${PROJECT_NAME}"
