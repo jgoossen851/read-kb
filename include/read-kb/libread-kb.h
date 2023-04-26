@@ -15,8 +15,16 @@
 // use `tail -f "/tmp/read-kb-debug-log.txt"` from a terminal to see debug messages
 #define DEBUG_LIB_READ_KB 0
 
-struct pollfd*  setup_readkb(void);
-std::string     getChar_readkb(struct pollfd* pfds);
-void            close_readkb(struct pollfd* pfds);
+class ReadKB {
+  public:
+    ReadKB();
+    std::string getKey(void);
+
+  private:
+    struct pollfd * pfds;
+    #if DEBUG_LIB_READ_KB == 1
+      FILE* g_pDebugLogFile;
+    #endif
+};
 
 #endif // LIBREAD_KB_H

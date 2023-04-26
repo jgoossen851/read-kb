@@ -29,18 +29,14 @@
 
 #define STDIN_FD 0 // Standard input file descriptor
 
-#if DEBUG_LIB_READ_KB == 1
-  FILE* g_pDebugLogFile;
-#endif
 
-struct pollfd* setup_readkb(void) {
+ReadKB::ReadKB() {
   // Initialize debugging log file
   #if DEBUG_LIB_READ_KB == 1
     g_pDebugLogFile = fopen ("/tmp/read-kb-debug-log.txt", "w");
   #endif
 
   // Get file descriptors for the poll command
-  struct pollfd *pfds;
   pfds = static_cast<pollfd*>(calloc(1, sizeof(struct pollfd)));
   errorIf(pfds == NULL, "malloc");
 
@@ -51,11 +47,9 @@ struct pollfd* setup_readkb(void) {
 
   // Request poll() to scan file descriptor for data available to read (POLLIN signal)
   pfds[0].events = POLLIN;
-
-  return pfds;
 }
 
-std::string getChar_readkb(struct pollfd* pfds) {
+std::string ReadKB::getKey() {
   int num_ready;
   std::string key_pressed;
 
@@ -89,16 +83,9 @@ std::string getChar_readkb(struct pollfd* pfds) {
 
       } else {
         // Process other signals (POLLERR | POLLHUP | POLLNVAL)
-
-        close_readkb(pfds);
         key_pressed.assign("SIGINT");
       }
     }
   }
   return key_pressed;
-}
-
-void close_readkb(struct pollfd* pfds) {
-  printlog("    closing fd %d\n", pfds[0].fd);
-  errorIf(close(pfds[0].fd) == -1, "close");
 }

@@ -12,7 +12,6 @@
 #include <string>
 #include <map>
 #include <iostream>
-#include <poll.h>
 
 #include "libread-kb.h"
 
@@ -37,18 +36,17 @@ int main(int argc, char* argv[]) {
   std::map<std::string, COMMANDS> dictionary = InitializeMap();
 
   // Initialize the keyboard input
-  struct pollfd *pfds = setup_readkb();
+  ReadKB kb;
 
   // Keep calling poll() as long as at least one file descriptor is open.
   std::string key_pressed;
   bool keep_reading = true;
   while(keep_reading) {
 
-    key_pressed = getChar_readkb(pfds);
+    key_pressed = kb.getKey();
 
     switch (dictionary[key_pressed]) {
     case EXIT_CODE : // Exit Condition
-        close_readkb(pfds);
         keep_reading = false;
         break;
     case HELP : // Print Usage
