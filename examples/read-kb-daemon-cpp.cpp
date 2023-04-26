@@ -32,42 +32,29 @@ static std::map<std::string, COMMANDS> InitializeMap();
 
 int main(int argc, char* argv[]) {
 
-  // Initialize the command map
-  std::map<std::string, COMMANDS> dictionary = InitializeMap();
-
-  // Initialize the keyboard input
+  // Initialize the command map and keyboard input
+  auto dictionary = InitializeMap();
   ReadKB kb;
 
   // Keep calling poll() as long as at least one file descriptor is open.
-  std::string key_pressed;
   bool keep_reading = true;
   while(keep_reading) {
 
-    key_pressed = kb.getKey();
-
+    std::string key_pressed = kb.getKey();
     switch (dictionary[key_pressed]) {
-    case EXIT_CODE : // Exit Condition
+      case EXIT_CODE : // Exit Condition
         keep_reading = false;
         break;
-    case HELP : // Print Usage
+      case HELP : // Print Usage
         std::cout << "Help" << std::endl;
         break;
-    case UP :
-        std::cout << "\e[A" << std::flush;
-        break;
-    case DOWN :
-        std::cout << "\e[B" << std::flush;
-        break;
-    case FORWARD :
-        std::cout << "\e[C" << std::flush;
-        break;
-    case BACK :
-        std::cout << "\e[D" << std::flush;
-        break;
-    default :
+      case UP :       std::cout << "\e[A" << std::flush;  break;
+      case DOWN :     std::cout << "\e[B" << std::flush;  break;
+      case FORWARD :  std::cout << "\e[C" << std::flush;  break;
+      case BACK :     std::cout << "\e[D" << std::flush;  break;
+      default :
         std::cout << "(" << key_pressed << ")" << std::flush;
     }
-
   }
 
   return 0;
