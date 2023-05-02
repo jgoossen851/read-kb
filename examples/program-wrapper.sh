@@ -34,7 +34,7 @@ DAEMON="${CPP_DAEMON}"
 
 cleanup() {
   # Send command through pipe to shutdown
-  echo 'SIGINT' > "${TEMP_DIR}/ipipe"
+  echo 'SIGTERM' > "${TEMP_DIR}/ipipe"
 
   # Close pipe (stop redirecting fd 3 to named fifo pipe)
   exec 3>&-

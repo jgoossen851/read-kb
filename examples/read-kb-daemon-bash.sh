@@ -7,7 +7,7 @@ while read KEY_NAME; do
 
   case "${KEY_NAME}" in
     # Define an exit command to receive through the pipe
-    'SIGINT')   exit ;;
+    'SIGTERM')  exit ;;
     # Process output of read-kb program
     'h')        echo "Help" ;;
     'Up')       echo -en "\e[A" ;;
