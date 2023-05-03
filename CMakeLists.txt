@@ -24,6 +24,8 @@ else()
   add_compile_options(-Werror)
 endif()
 
+add_subdirectory(app)
+
 install(PROGRAMS src/read-kb.sh
         DESTINATION bin
         RENAME "${PROJECT_NAME}"
