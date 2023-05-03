@@ -34,7 +34,7 @@ DAEMON="${CPP_DAEMON}"
 
 cleanup() {
   # Send command through pipe to shutdown
-  echo 'SIGINT' > "${TEMP_DIR}/ipipe"
+  echo 'SIGTERM' > "${TEMP_DIR}/ipipe"
 
   # Close pipe (stop redirecting fd 3 to named fifo pipe)
   exec 3>&-
@@ -47,7 +47,7 @@ cleanup() {
 # Run cleanup on any exit
 trap 'cleanup' EXIT
 
-echo "Press 'Ctrl-C' to quit."
+echo "Press 'X'(not yet working) or 'Ctrl-C' to quit."
 
 
 # Create a pipe for input to the daemon
@@ -75,5 +75,5 @@ echo "Done."
 
 while true; do
   # Send keyboard events to the pipe
-  echo "$(read-kb 2>/dev/null)" > "${TEMP_DIR}/ipipe"
+  read-kb 2> /dev/null 1> "${TEMP_DIR}/ipipe"
 done

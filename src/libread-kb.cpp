@@ -83,7 +83,7 @@ std::string ReadKB::getKey() {
 
       } else {
         // Process other signals (POLLERR | POLLHUP | POLLNVAL)
-        key_pressed.assign("SIGINT");
+        key_pressed.assign("SIGTERM");
       }
     }
   }

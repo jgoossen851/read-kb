@@ -3,6 +3,8 @@
 # Halts and waits for a keypress
 # Echos the key name to stdout
 
+READ_KB_TIMEOUT_MIN=${1:-5} # Will send "SIGALRM" and exit 1 after timeout period
+
 function nameChar {
   local char=${1:-""}
   case ${char} in
@@ -183,5 +185,11 @@ function nameEscSeq {
 }
 
 # change IFS for distinguishing " ", "\t" from "\n"
-IFS= read -rsn1 MODE # Get 1 character
-nameChar "${MODE}"
+IFS= read -rsn1 -t $((${READ_KB_TIMEOUT_MIN}*60)) MODE # Get 1 character
+if [ $? -eq 0 ]; then
+  nameChar "${MODE}"
+  exit 0
+else
+  echo "SIGALRM"
+  exit 1
+fi
