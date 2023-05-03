@@ -9,6 +9,7 @@ while read KEY_NAME; do
     # Define an exit command to receive through the pipe
     'SIGTERM')  exit ;;
     # Process output of read-kb program
+    'x' | 'X')  exit ;;
     'h')        echo "Help" ;;
     'Up')       echo -en "\e[A" ;;
     'Down')     echo -en "\e[B" ;;

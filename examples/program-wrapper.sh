@@ -47,7 +47,7 @@ cleanup() {
 # Run cleanup on any exit
 trap 'cleanup' EXIT
 
-echo "Press 'Ctrl-C' to quit."
+echo "Press 'X'(not yet working) or 'Ctrl-C' to quit."
 
 
 # Create a pipe for input to the daemon

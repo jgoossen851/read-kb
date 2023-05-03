@@ -66,6 +66,8 @@ std::map<std::string, COMMANDS> InitializeMap(){
 
   // Define user commands
   dictionary["SIGTERM"] = EXIT_CODE;
+  dictionary["x"]       = EXIT_CODE;
+  dictionary["X"]       = EXIT_CODE;
   dictionary["h"]       = HELP;
   dictionary["Up"]      = UP;
   dictionary["Down"]    = DOWN;
