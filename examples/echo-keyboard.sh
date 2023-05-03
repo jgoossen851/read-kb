@@ -3,5 +3,5 @@
 echo "Press 'Ctrl-C' to quit."
 
 while true; do
-  echo "$(read-kb 2>/dev/null)"
+  read-kb 2>/dev/null
 done

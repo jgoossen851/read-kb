@@ -75,5 +75,5 @@ echo "Done."
 
 while true; do
   # Send keyboard events to the pipe
-  echo "$(read-kb 2>/dev/null)" > "${TEMP_DIR}/ipipe"
+  read-kb 2> /dev/null 1> "${TEMP_DIR}/ipipe"
 done
