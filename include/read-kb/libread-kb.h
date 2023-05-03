@@ -8,20 +8,27 @@
 #ifndef LIBREAD_KB_H
 #define LIBREAD_KB_H
 
-#include <string>
 #include <cstdio>
-#include <poll.h>
+#include <string>
 
 // use `tail -f "/tmp/read-kb-debug-log.txt"` from a terminal to see debug messages
 #define DEBUG_LIB_READ_KB 0
 
+enum ReadKbMode {
+  KB_CHAR,
+  KB_LINE,
+  KB_FILE
+};
+
 class ReadKB {
   public:
     ReadKB();
-    std::string getKey(void);
+    std::string read_key();
+    std::string read_line() { return "Not yet implemented"; };
+    std::string read_file() { return "Not yet implemented"; };
 
   private:
-    struct pollfd * pfds;
+    ReadKbMode mode_ = KB_CHAR;
     #if DEBUG_LIB_READ_KB == 1
       FILE* g_pDebugLogFile;
     #endif
