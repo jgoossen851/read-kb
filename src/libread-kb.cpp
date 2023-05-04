@@ -30,6 +30,7 @@
                               }} while (0)
 
 #define STDIN_FD 0 // Standard input file descriptor
+#define BUFF_SIZE_CHARS 8 // Unicode less than 5 bytes and longest ANSI sequence (that I know of) is of the form e[nn;n~
 
 
 std::ostream& operator<<(std::ostream& os, ReadKB::Key kb) {
@@ -118,7 +119,7 @@ ReadKB::Key ReadKB::read_key() {
   // Deal with array returned by poll()
   {
     // Read from pipe one buffer-length at a time
-    char buf[8]; // Unicode less than 5 bytes and longest ANSI sequence (that I know of) is e[nn;n~
+    u_char buf[BUFF_SIZE_CHARS];
 
     if (pfds[0].revents != 0) {
 
@@ -134,7 +135,12 @@ ReadKB::Key ReadKB::read_key() {
 
         ssize_t s = read(pfds[0].fd, buf, sizeof(buf));
         errorIf(s == -1, "read");
-        printlog("    read %zd bytes: \033[1m%.*s\033[0m\n", s, (int) s, buf);
+        errorIf(s + 1 > BUFF_SIZE_CHARS, "read buffer overflow");
+        printlog("    read %zd bytes: \033[1m", s);
+        for (int ii = 0; ii < s; ii++) {
+          printlog("%d  ", (uint)buf[ii]);
+        }
+        printlog("\033[0m\n");
 
         key_pressed = static_cast<Key>(buf[0]);
 
