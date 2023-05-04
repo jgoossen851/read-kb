@@ -8,6 +8,8 @@
 #ifndef LIBREAD_KB_H
 #define LIBREAD_KB_H
 
+#include <poll.h>
+
 #include <cstdio>
 #include <string>
 
@@ -29,6 +31,7 @@ class ReadKB {
 
   private:
     ReadKbMode mode_ = KB_CHAR;
+    struct pollfd *pfds;
     #if DEBUG_LIB_READ_KB == 1
       FILE* g_pDebugLogFile;
     #endif
