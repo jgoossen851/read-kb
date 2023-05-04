@@ -31,10 +31,10 @@ int main() {
   auto dictionary = InitializeMap();
   ReadKB kb;
 
-  std::string key;
+  ReadKB::Key key;
   while(true) {
     key = kb.read_key();
-    std::cout << "[" << key << "]" << std::flush; 
+    std::cout << "[" << key << "]" << std::flush;
   }
   
   // Keep reading input as long as at least one file descriptor is open.

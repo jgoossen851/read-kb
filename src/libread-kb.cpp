@@ -32,6 +32,54 @@
 #define STDIN_FD 0 // Standard input file descriptor
 
 
+std::ostream& operator<<(std::ostream& os, ReadKB::Key kb) {
+  if (kb >= ReadKB::Key::SPACE && kb < ReadKB::Key::DEL) {
+    // Printable
+    os << static_cast<char>(kb);
+  } else {
+    // Unprintable
+    switch (kb) {
+      case ReadKB::Key::NUL : os << "NUL";        break;
+      case ReadKB::Key::SOH : os << "SOH";        break;
+      case ReadKB::Key::STX : os << "STX";        break;
+      case ReadKB::Key::ETX : os << "ETX";        break;
+      case ReadKB::Key::EOT : os << "EOT";        break;
+      case ReadKB::Key::ENQ : os << "ENQ";        break;
+      case ReadKB::Key::ACK : os << "ACK";        break;
+      case ReadKB::Key::BEL : os << "BEL";        break;
+      case ReadKB::Key::BS  : os << "Ctrl-Bksp";  break;
+      case ReadKB::Key::HT  : os << "Tab";        break;
+      case ReadKB::Key::LF  : os << "Enter";      break;
+      case ReadKB::Key::VT  : os << "VT";         break;
+      case ReadKB::Key::FF  : os << "FF";         break;
+      case ReadKB::Key::CR  : os << "CR";         break;
+      case ReadKB::Key::SO  : os << "SO";         break;
+      case ReadKB::Key::SI  : os << "SI";         break;
+      case ReadKB::Key::DLE : os << "DLE";        break;
+      case ReadKB::Key::DC1 : os << "DC1";        break;
+      case ReadKB::Key::DC2 : os << "DC2";        break;
+      case ReadKB::Key::DC3 : os << "DC3";        break;
+      case ReadKB::Key::DC4 : os << "DC4";        break;
+      case ReadKB::Key::NAK : os << "NAK";        break;
+      case ReadKB::Key::SYN : os << "SYN";        break;
+      case ReadKB::Key::ETB : os << "ETB";        break;
+      case ReadKB::Key::CAN : os << "CAN";        break;
+      case ReadKB::Key::EM  : os << "EM";         break;
+      case ReadKB::Key::SUB : os << "SUB";        break;
+      case ReadKB::Key::ESC : os << "Esc";        break;
+      case ReadKB::Key::FS  : os << "FS";         break;
+      case ReadKB::Key::GS  : os << "GS";         break;
+      case ReadKB::Key::RS  : os << "RS";         break;
+      case ReadKB::Key::US  : os << "US";         break;
+      case ReadKB::Key::DEL : os << "Bksp";       break;
+      // Beyond ASCII
+      case ReadKB::Key::SPACE :
+      case ReadKB::Key::UNDEFINED : os << "Undefined: " << static_cast<char>(kb); break;
+    }
+  }
+  return os;
+}
+
 ReadKB::ReadKB() {
   // Initialize debugging log file
   #if DEBUG_LIB_READ_KB == 1
@@ -58,9 +106,9 @@ ReadKB::ReadKB() {
   pfds[0].events = POLLIN;
 }
 
-std::string ReadKB::read_key() {
+ReadKB::Key ReadKB::read_key() {
   int num_ready;
-  std::string key_pressed;
+  Key key_pressed;
 
   printlog("Polling pipe for signal or data... ");
   num_ready = poll(pfds, 1, -1);
@@ -88,11 +136,11 @@ std::string ReadKB::read_key() {
         errorIf(s == -1, "read");
         printlog("    read %zd bytes: \033[1m%.*s\033[0m\n", s, (int) s, buf);
 
-        key_pressed.assign(buf, s);
+        key_pressed = static_cast<Key>(buf[0]);
 
       } else {
         // Process other signals (POLLERR | POLLHUP | POLLNVAL)
-        key_pressed.assign("SIGTERM");
+        key_pressed = Key::UNDEFINED;
       }
     }
   }

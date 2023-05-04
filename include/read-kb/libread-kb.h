@@ -11,6 +11,7 @@
 #include <poll.h>
 
 #include <cstdio>
+#include <ostream>
 #include <string>
 
 // use `tail -f "/tmp/read-kb-debug-log.txt"` from a terminal to see debug messages
@@ -22,10 +23,32 @@ enum ReadKbMode {
   KB_FILE
 };
 
+
 class ReadKB {
   public:
+enum class Key {
+  NUL = 0,  SOH,  STX,  ETX,
+  EOT,      ENQ,  ACK,  BEL,
+  BS,       HT,   LF,   VT,
+  FF,       CR,   SO,   SI,
+  DLE,      DC1,  DC2,  DC3,
+  DC4,      NAK,  SYN,  ETB,
+  CAN,      EM,   SUB,  ESC,
+  FS,       GS,   RS,   US,
+  SPACE = 32, // First printable character
+  DEL = 127,
+  // Aliases
+  CTRL_BKSP = BS,
+  TAB = HT,
+  ENTER = LF,
+  XON = DC1,
+  XOFF = DC3,
+  BACKSPACE = DEL,
+  // Beyond ASCII
+  UNDEFINED
+};
     ReadKB();
-    std::string read_key();
+    Key read_key();
     std::string read_line() { return "Not yet implemented"; };
     std::string read_file() { return "Not yet implemented"; };
 
@@ -36,5 +59,7 @@ class ReadKB {
       FILE* g_pDebugLogFile;
     #endif
 };
+
+std::ostream& operator<<(std::ostream& os, ReadKB::Key kb);
 
 #endif // LIBREAD_KB_H
