@@ -45,7 +45,9 @@ enum class Key {
   XOFF = DC3,
   BACKSPACE = DEL,
   // Beyond ASCII
-  UNDEFINED
+  UNDEFINED_ESCAPE,
+  UNDEFINED,
+  ERROR
 };
     ReadKB();
     Key read_key();

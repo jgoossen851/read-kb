@@ -75,7 +75,9 @@ std::ostream& operator<<(std::ostream& os, ReadKB::Key kb) {
       case ReadKB::Key::DEL : os << "Bksp";       break;
       // Beyond ASCII
       case ReadKB::Key::SPACE :
+      case ReadKB::Key::UNDEFINED_ESCAPE : os << "Undef Esc"; break;
       case ReadKB::Key::UNDEFINED : os << "Undefined"; break;
+      case ReadKB::Key::ERROR : os << "Error"; break;
     }
   }
   return os;
@@ -143,14 +145,20 @@ ReadKB::Key ReadKB::read_key() {
         printlog("\033[0m\n");
 
         if (s == 1 && buf[0] <= 127) {
+          // ASCII
           key_pressed = static_cast<Key>(buf[0]);
         } else {
-          key_pressed = Key::UNDEFINED;
+          switch (buf[0]) {
+            case '\033' : // Esc
+              key_pressed = Key::UNDEFINED_ESCAPE;
+              break;
+            default : key_pressed = Key::UNDEFINED;
+          }
         }
 
       } else {
         // Process other signals (POLLERR | POLLHUP | POLLNVAL)
-        key_pressed = Key::UNDEFINED;
+        key_pressed = Key::ERROR;
       }
     }
   }
