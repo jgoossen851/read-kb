@@ -11,6 +11,7 @@
 #include <poll.h>
 #include <unistd.h>
 
+#include <cassert>
 #include <cstdio>
 #include <fstream>
 #include <iostream>
@@ -75,6 +76,8 @@ std::ostream& operator<<(std::ostream& os, ReadKB::Key kb) {
       case ReadKB::Key::DEL : os << "Bksp";       break;
       // Beyond ASCII
       case ReadKB::Key::SPACE :
+      case ReadKB::Key::UNDEFINED_CSI : os << "Undef CSI"; break;
+      case ReadKB::Key::UNDEFINED_SS3 : os << "Undef SS3"; break;
       case ReadKB::Key::UNDEFINED_ESCAPE : os << "Undef Esc"; break;
       case ReadKB::Key::UNDEFINED : os << "Undefined"; break;
       case ReadKB::Key::ERROR : os << "Error"; break;
@@ -150,7 +153,17 @@ ReadKB::Key ReadKB::read_key() {
         } else {
           switch (buf[0]) {
             case '\033' : // Esc
-              key_pressed = Key::UNDEFINED_ESCAPE;
+              assert(s > 1 && "No more chars in buffer to read");
+              switch (buf[1]) {
+                case '[' : // Control Sequence Introducer
+                  key_pressed = Key::UNDEFINED_CSI;
+                  break;
+                case 'O' : // Single Shift Three
+                  key_pressed = Key::UNDEFINED_SS3;
+                  break;
+                // Alt-key
+                default : key_pressed = Key::UNDEFINED_ESCAPE;
+              }
               break;
             default : key_pressed = Key::UNDEFINED;
           }
