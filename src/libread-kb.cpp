@@ -34,7 +34,7 @@
 #define BUFF_SIZE_CHARS 8 // Unicode less than 5 bytes and longest ANSI sequence (that I know of) is of the form e[nn;n~
 
 
-std::ostream& operator<<(std::ostream& os, ReadKB::Key kb) {
+std::ostream& operator<<(std::ostream& os, const ReadKB::Key kb) {
   if (kb >= ReadKB::Key::SPACE && kb < ReadKB::Key::DEL) {
     // Printable
     os << static_cast<char>(kb);
@@ -112,7 +112,7 @@ ReadKB::ReadKB() {
   pfds[0].events = POLLIN;
 }
 
-ReadKB::Key ReadKB::read_key() {
+ReadKB::Key ReadKB::read_key() const {
   int num_ready;
   Key key_pressed;
 
@@ -147,27 +147,7 @@ ReadKB::Key ReadKB::read_key() {
         }
         printlog("\033[0m\n");
 
-        if (s == 1 && buf[0] <= 127) {
-          // ASCII
-          key_pressed = static_cast<Key>(buf[0]);
-        } else {
-          switch (buf[0]) {
-            case '\033' : // Esc
-              assert(s > 1 && "No more chars in buffer to read");
-              switch (buf[1]) {
-                case '[' : // Control Sequence Introducer
-                  key_pressed = Key::UNDEFINED_CSI;
-                  break;
-                case 'O' : // Single Shift Three
-                  key_pressed = Key::UNDEFINED_SS3;
-                  break;
-                // Alt-key
-                default : key_pressed = Key::UNDEFINED_ESCAPE;
-              }
-              break;
-            default : key_pressed = Key::UNDEFINED;
-          }
-        }
+        key_pressed = categorizeBuffer(buf, s);
 
       } else {
         // Process other signals (POLLERR | POLLHUP | POLLNVAL)
@@ -177,3 +157,32 @@ ReadKB::Key ReadKB::read_key() {
   }
   return key_pressed;
 }
+
+
+ReadKB::Key ReadKB::categorizeBuffer(const u_char *buf, const ssize_t len) const {
+  assert(len > 0 && "Nothing in buffer to process");
+  Key key_pressed;
+  if (len == 1 && buf[0] <= 127) {
+    // ASCII
+    key_pressed = static_cast<Key>(buf[0]);
+  } else {
+    switch (buf[0]) {
+      case '\033' : // Esc
+        assert(len > 1 && "No more chars in buffer to read");
+        switch (buf[1]) {
+          case '[' : // Control Sequence Introducer
+            key_pressed = Key::UNDEFINED_CSI;
+            break;
+          case 'O' : // Single Shift Three
+            key_pressed = Key::UNDEFINED_SS3;
+            break;
+          // Alt-key
+          default : key_pressed = Key::UNDEFINED_ESCAPE;
+        }
+        break;
+      default : key_pressed = Key::UNDEFINED;
+    }
+  }
+
+  return key_pressed;
+};

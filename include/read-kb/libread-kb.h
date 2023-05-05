@@ -26,35 +26,36 @@ enum ReadKbMode {
 
 class ReadKB {
   public:
-enum class Key {
-  NUL = 0,  SOH,  STX,  ETX,
-  EOT,      ENQ,  ACK,  BEL,
-  BS,       HT,   LF,   VT,
-  FF,       CR,   SO,   SI,
-  DLE,      DC1,  DC2,  DC3,
-  DC4,      NAK,  SYN,  ETB,
-  CAN,      EM,   SUB,  ESC,
-  FS,       GS,   RS,   US,
-  SPACE = 32, // First printable character
-  DEL = 127,
-  // Aliases
-  CTRL_BKSP = BS,
-  TAB = HT,
-  ENTER = LF,
-  XON = DC1,
-  XOFF = DC3,
-  BACKSPACE = DEL,
-  // Beyond ASCII
-  UNDEFINED_CSI,
-  UNDEFINED_SS3,
-  UNDEFINED_ESCAPE,
-  UNDEFINED,
-  ERROR
-};
+    enum class Key {
+      NUL = 0,  SOH,  STX,  ETX,
+      EOT,      ENQ,  ACK,  BEL,
+      BS,       HT,   LF,   VT,
+      FF,       CR,   SO,   SI,
+      DLE,      DC1,  DC2,  DC3,
+      DC4,      NAK,  SYN,  ETB,
+      CAN,      EM,   SUB,  ESC,
+      FS,       GS,   RS,   US,
+      SPACE = 32, // First printable character
+      DEL = 127,
+      // Aliases
+      CTRL_BKSP = BS,
+      TAB = HT,
+      ENTER = LF,
+      XON = DC1,
+      XOFF = DC3,
+      BACKSPACE = DEL,
+      // Beyond ASCII
+      UNDEFINED_CSI,
+      UNDEFINED_SS3,
+      UNDEFINED_ESCAPE,
+      UNDEFINED,
+      ERROR
+    };
+
     ReadKB();
-    Key read_key();
-    std::string read_line() { return "Not yet implemented"; };
-    std::string read_file() { return "Not yet implemented"; };
+    Key read_key() const;
+    std::string read_line() const { return "Not yet implemented"; };
+    std::string read_file() const { return "Not yet implemented"; };
 
   private:
     ReadKbMode mode_ = KB_CHAR;
@@ -62,8 +63,10 @@ enum class Key {
     #if DEBUG_LIB_READ_KB == 1
       FILE* g_pDebugLogFile;
     #endif
+
+    Key categorizeBuffer(const u_char *buf, const ssize_t len) const;
 };
 
-std::ostream& operator<<(std::ostream& os, ReadKB::Key kb);
+std::ostream& operator<<(std::ostream& os, const ReadKB::Key kb);
 
 #endif // LIBREAD_KB_H
