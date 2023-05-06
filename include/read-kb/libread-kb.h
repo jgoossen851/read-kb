@@ -36,7 +36,7 @@ class ReadKB {
     ERROR     = 1<<16,
     UNDEFINED
   };
-  
+
   enum class BitmaskClear : uint {
     // When mask is applied with &, the corresponding bits will be cleared
     Shift   = static_cast<uint>(BitmaskSet::Lowercase),
@@ -46,13 +46,14 @@ class ReadKB {
   };
 
  public:
+  /// Modifier keys that can be combined via & operator with a ReadKB::Key
   struct Mod {
     static const BitmaskClear Shft = BitmaskClear::Shift;
     static const BitmaskSet   Ctrl = BitmaskSet::Control;
     static const BitmaskSet   Alt  = BitmaskSet::Alternate;
   };
 
-  /// A combination of a key with potential modifier keys (Shift, Ctrl, Alt)
+  /// A standalone key or combination of a key with potential modifier keys (Shift, Ctrl, Alt)
   class Key {
    public:
     // Unscoped enum to enable implicit conversion to uint
@@ -93,14 +94,14 @@ class ReadKB {
       : mkey(static_cast<KeyValue>(key)) {};
 
     // Promoter to integral type for use in switch
-    constexpr operator uint() const {return mkey;}
+    constexpr operator uint() const {return static_cast<uint>(mkey);}
 
     // Bitwise operators
     friend constexpr ReadKB::Key operator&(const ReadKB::Key& key, const ReadKB::BitmaskSet& mSet) {
-      return ReadKB::Key(key.mkey | static_cast<uint>(mSet));
+      return ReadKB::Key(key | static_cast<uint>(mSet));
     }
     friend constexpr ReadKB::Key operator&(const ReadKB::Key& key, const ReadKB::BitmaskClear& mClr) {
-      return ReadKB::Key(key.mkey & ~static_cast<uint>(mClr));
+      return ReadKB::Key(key & ~static_cast<uint>(mClr));
     }
 
     friend std::ostream& operator<<(std::ostream& os, const ReadKB::Key& kb);

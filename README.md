@@ -19,10 +19,11 @@ First make the `install` target.
 
 ### C++
 
-Values are returned as a `ReadKb::Combo` class. Key values are provided as an enum. 
-The Combo class can be passed to an ostream object for display.
-A combo object may be created by adding modifiers with the bitwise and operator (`&`), or a `ReadKb::Key` can be used in a switch statement by casting it as an `uint`.
-The following key names are enumerated, with their associated display value:
+Values are returned as a `ReadKb::Key` class. Key values are provided as an unscoped enum within the class.
+Objects of the `ReadKB::Key` class can be promoted to an integral type and can therefore be used in a `switch` statement.
+The output stream operator `<<` is also defined for the class to return the key's display name.
+A key in the `ReadKB::Key` class may be modified by modifier keys in the `ReadKB::Mod` class using the bitwise "and" operator (`&`).
+The following key names are enumerated, listed with their associated display value:
 
 | Enum Name    | Display  |
 | ------------ | -------- |

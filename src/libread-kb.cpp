@@ -35,9 +35,9 @@
 
 
 std::ostream& operator<<(std::ostream& os, const ReadKB::Key& kb) {
-  if ((kb.mkey >= static_cast<uint>('a') && kb.mkey <= static_cast<uint>('z')) ||
-      (kb.mkey >= static_cast<uint>('A') && kb.mkey <= static_cast<uint>('Z')) ||
-      (kb.mkey >= static_cast<uint>('0') && kb.mkey <= static_cast<uint>('9'))) {
+  if ((kb >= static_cast<uint>('a') && kb <= static_cast<uint>('z')) ||
+      (kb >= static_cast<uint>('A') && kb <= static_cast<uint>('Z')) ||
+      (kb >= static_cast<uint>('0') && kb <= static_cast<uint>('9'))) {
     // Alphanumeric
     os << static_cast<char>(kb.mkey);
   } else {
