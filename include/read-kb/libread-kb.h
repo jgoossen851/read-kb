@@ -147,10 +147,10 @@ class ReadKB {
     constexpr operator uint() const {return static_cast<uint>(mkey);}
 
     // Bitwise operators
-    friend constexpr Key operator&(const Key& key, const BitmaskSet& mSet) {
+    friend constexpr Key operator&(const Key& key, const BitmaskSet mSet) {
       return Key(key | static_cast<uint>(mSet));
     }
-    friend constexpr Key operator&(const Key& key, const BitmaskClear& mClr) {
+    friend constexpr Key operator&(const Key& key, const BitmaskClear mClr) {
       return Key(key & ~static_cast<uint>(mClr));
     }
 
