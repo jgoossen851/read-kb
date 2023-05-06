@@ -15,6 +15,9 @@
 #define ANSI_GRN "\033[32m"
 #define ANSI_RST "\033[0m"
 
+#define U_LA "\u27e8" //!> Left Angle Bracket
+#define U_RA "\u27e9" //!> Right Angle Bracket
+
 // Check that global namespace is not polluted
 enum TestEnum {
   Enter,
@@ -25,8 +28,8 @@ int failTest( std::string ansString,
               std::string resultString,
               std::string description ) {
   std::cout << ANSI_RED << "Test Failed: " << ANSI_RST;
-  std::cout << "Should be [" << ansString << "] but was [" << resultString
-            << "] : " << description << std::endl;
+  std::cout << "Should be " U_LA << ansString << U_RA " but was " U_LA << resultString
+            << U_RA " : " << description << std::endl;
   return EXIT_FAILURE;
 }
 
