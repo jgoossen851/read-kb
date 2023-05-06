@@ -7,5 +7,6 @@ pushd "${SCRIPT_DIR}"
 # Build project
 cmake -S . -B build/                        || exit
 sudo cmake --build build/ --target install  || exit
+ctest --test-dir build/ --output-on-failure || exit
 
 popd

@@ -42,3 +42,8 @@ target_include_directories(libread-kb PUBLIC
       )
 
 add_subdirectory(examples)
+
+# Enable tests to be added in subdirectories
+include(CTest)
+
+add_subdirectory(test/src)
