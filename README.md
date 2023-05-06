@@ -19,71 +19,73 @@ First make the `install` target.
 
 ### C++
 
-Values are returned in an enum, and can be passed to an ostream object for display.
+Values are returned as a `ReadKb::Combo` class. Key values are provided as an enum. 
+The Combo class can be passed to an ostream object for display.
+A combo object may be created by adding modifiers with the bitwise and operator (`&`), or a `ReadKb::Key` can be used in a switch statement by casting it as an `uint`.
 The following key names are enumerated, with their associated display value:
 
-| Enum Name    | Display |
-| ------------ | ------- |
-| DoubleQuote  | "       |
-| LeftAngle    | <       |
-| Underscore   | _       |
-| RightAngle   | >       |
-| Question     | ?       |
-| RightParen   | )       |
-| Exclamation  | !       |
-| At           | @       |
-| Hash         | #       |
-| Dollar       | $       |
-| Percent      | %       |
-| Circumflex   | ^       |
-| Ampersand    | &       |
-| Asterisk     | *       |
-| LeftParen    | )       |
-| Colon        | :       |
-| Plus         | +       |
-| Space        |         |
-| Quote        | '       |
-| Comma        | ,       |
-| Dash         | -       |
-| Period       | .       |
-| Slash        | /       |
-| Semicolon    | ;       |
-| Equal        | =       |
-| Tilde        | ~       |
-| LeftBrace    | {       |
-| Pipe         | \|      |
-| RightBrace   | }       |
-| Grave        | `       |
-| LeftBracket  | [       |
-| Backslash    | \\      |
-| RightBracket | ]       |
-| Backspace    | Bksp    |
-| Insert       | Ins     |
-| Delete       | Del     |
-| PageUp       | PgUp    |
-| PageDown     | PgDn    |
-| F1           | F1      |
-| F2           | F2      |
-| F3           | F3      |
-| F4           | F4      |
-| F5           | F5      |
-| F6           | F6      |
-| F7           | F7      |
-| F8           | F8      |
-| F9           | F9      |
-| F10          | F10     |
-| F11          | F11     |
-| F12          | F12     |
-| Up           | Up      |
-| Down         | Down    |
-| Right        | Right   |
-| Left         | Left    |
-| Center       | Center  |
-| End          | End     |
-| Home         | Home    |
-| Tab          | Tab     |
-| Enter        | Enter   |
-| Esc          | Esc     |
+| Enum Name    | Display  |
+| ------------ | -------- |
+| DoubleQuote  | `"`      |
+| LeftAngle    | `<`      |
+| Underscore   | `_`      |
+| RightAngle   | `>`      |
+| Question     | `?`      |
+| RightParen   | `)`      |
+| Exclamation  | `!`      |
+| At           | `@`      |
+| Hash         | `#`      |
+| Dollar       | `$`      |
+| Percent      | `%`      |
+| Circumflex   | `^`      |
+| Ampersand    | `&`      |
+| Asterisk     | `*`      |
+| LeftParen    | `)`      |
+| Colon        | `:`      |
+| Plus         | `+`      |
+| Space        | ` `      |
+| Quote        | `'`      |
+| Comma        | `,`      |
+| Dash         | `-`      |
+| Period       | `.`      |
+| Slash        | `/`      |
+| Semicolon    | `;`      |
+| Equal        | `=`      |
+| Tilde        | `~`      |
+| LeftBrace    | `{`      |
+| Pipe         | `\|`     |
+| RightBrace   | `}`      |
+| Grave        | `` ` ``  |
+| LeftBracket  | `[`      |
+| Backslash    | `\`      |
+| RightBracket | `]`      |
+| Backspace    | `Bksp`   |
+| Insert       | `Ins`    |
+| Delete       | `Del`    |
+| PageUp       | `PgUp`   |
+| PageDown     | `PgDn`   |
+| F1           | `F1`     |
+| F2           | `F2`     |
+| F3           | `F3`     |
+| F4           | `F4`     |
+| F5           | `F5`     |
+| F6           | `F6`     |
+| F7           | `F7`     |
+| F8           | `F8`     |
+| F9           | `F9`     |
+| F10          | `F10`    |
+| F11          | `F11`    |
+| F12          | `F12`    |
+| Up           | `Up`     |
+| Down         | `Down`   |
+| Right        | `Right`  |
+| Left         | `Left`   |
+| Center       | `Center` |
+| End          | `End`    |
+| Home         | `Home`   |
+| Tab          | `Tab`    |
+| Enter        | `Enter`  |
+| Esc          | `Esc`    |
 
 ### Bash
 
