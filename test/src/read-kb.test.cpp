@@ -8,6 +8,7 @@
 #include "libread-kb.h"
 
 #include <iostream>
+#include <sstream>
 #include <string>
 
 #define ANSI_RED "\033[31m"
@@ -20,18 +21,44 @@ enum TestEnum {
   UNDEFINED
 };
 
+int failTest( std::string ansString,
+              std::string resultString,
+              std::string description ) {
+  std::cout << ANSI_RED << "Test Failed: " << ANSI_RST;
+  std::cout << "Should be [" << ansString << "] but was [" << resultString
+            << "] : " << description << std::endl;
+  return EXIT_FAILURE;
+}
+
+int testEq( const std::string &result,
+            const std::string &answer,
+            const std::string &description = "No description") {
+  if( answer != result) {
+    return failTest(answer, result, description);
+  }
+  return EXIT_SUCCESS;
+}
+
 int main() {
 
   // Initialize exit status
   int st = EXIT_SUCCESS;
 
+  // Printable ASCII chars are displayed as such after construction
+  for (char cc = ' '; cc <= '~'; cc++) {
+    std::ostringstream os;
+    os << ReadKB::Key(cc);
+    st |= testEq(os.str(), std::string(1, cc), "Printable Char Constructor");
+  }
+
   // Test that Modifiers in a switch compile
   ReadKB::Key key = ReadKB::Key::UNDEFINED;
   switch(key) {
     case ReadKB::Key::Comma: break;
-    case ReadKB::Key::Period: break; /// @todo Remove static_cast from end usage
+    case ReadKB::Key::Period: break;
     case ReadKB::Key::Exclamation & ReadKB::Mod::Shft: break;
     // case ReadKB::Mod::Shft & ReadKB::Key::Equal: break; /// @todo Allow key to be placed last
+    // case ReadKB::Mod::Alt & ReadKB::Mod::Ctrl & ReadKB::Key::Up: break; /// @todo Allow key to be placed last with multiple mods
     case ReadKB::Key::Question & ReadKB::Mod::Ctrl & ReadKB::Mod::Alt : break;
     default: break;
   }

@@ -90,7 +90,9 @@ class ReadKB {
 
     constexpr Key()
       : mkey(KeyValue::ERROR) {};
-    constexpr Key(const uint key)
+    constexpr Key(const uint &key)
+      : mkey(static_cast<KeyValue>(key)) {};
+    constexpr Key(const char &key)
       : mkey(static_cast<KeyValue>(key)) {};
 
     // Promoter to integral type for use in switch

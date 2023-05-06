@@ -191,7 +191,7 @@ ReadKB::Key ReadKB::categorizeBuffer(const u_char *buf, const ssize_t len) const
   ReadKB::Key key_pressed;
   if (len == 1 && buf[0] <= 127) {
     // ASCII
-    key_pressed = static_cast<ReadKB::Key>(buf[0]);
+    key_pressed = static_cast<ReadKB::Key>(char(buf[0]));
   } else {
     switch (buf[0]) {
       case '\033' : // Esc
