@@ -10,6 +10,7 @@
 #include <iostream>
 #include <sstream>
 #include <string>
+#include <map>
 
 #define ANSI_RED "\033[31m"
 #define ANSI_GRN "\033[32m"
@@ -47,11 +48,50 @@ int main() {
   // Initialize exit status
   int st = EXIT_SUCCESS;
 
+  // Define desired display names for unprintable ASCII control codes
+  std::map<char, std::string> asciiUnprintableDisplayNames;
+  asciiUnprintableDisplayNames[0]  = "Ctrl-@";
+  asciiUnprintableDisplayNames[1]  = "Ctrl-a";
+  asciiUnprintableDisplayNames[2]  = "Ctrl-b";
+  asciiUnprintableDisplayNames[3]  = "Ctrl-c";
+  asciiUnprintableDisplayNames[4]  = "Ctrl-d";
+  asciiUnprintableDisplayNames[5]  = "Ctrl-e";
+  asciiUnprintableDisplayNames[6]  = "Ctrl-f";
+  asciiUnprintableDisplayNames[7]  = "Ctrl-g";
+  asciiUnprintableDisplayNames[8]  = "Ctrl-Bksp"; // BS
+  asciiUnprintableDisplayNames[9]  = "Tab";       // HT
+  asciiUnprintableDisplayNames[10] = "Enter";     // LF
+  asciiUnprintableDisplayNames[11] = "Ctrl-k";
+  asciiUnprintableDisplayNames[12] = "Ctrl-l";
+  asciiUnprintableDisplayNames[13] = "Ctrl-m";
+  asciiUnprintableDisplayNames[14] = "Ctrl-n";
+  asciiUnprintableDisplayNames[15] = "Ctrl-o";
+  asciiUnprintableDisplayNames[16] = "Ctrl-p";
+  asciiUnprintableDisplayNames[17] = "Ctrl-q";
+  asciiUnprintableDisplayNames[18] = "Ctrl-r";
+  asciiUnprintableDisplayNames[19] = "Ctrl-s";
+  asciiUnprintableDisplayNames[20] = "Ctrl-t";
+  asciiUnprintableDisplayNames[21] = "Ctrl-u";
+  asciiUnprintableDisplayNames[22] = "Ctrl-v";
+  asciiUnprintableDisplayNames[23] = "Ctrl-w";
+  asciiUnprintableDisplayNames[24] = "Ctrl-x";
+  asciiUnprintableDisplayNames[25] = "Ctrl-y";
+  asciiUnprintableDisplayNames[26] = "Ctrl-z";
+  asciiUnprintableDisplayNames[27] = "Esc";       // ESC
+  asciiUnprintableDisplayNames[28] = "Ctrl-\\";
+  asciiUnprintableDisplayNames[29] = "Ctrl-]";
+  asciiUnprintableDisplayNames[30] = "Ctrl-^";
+  asciiUnprintableDisplayNames[31] = "Ctrl-_";
+
   // Printable ASCII chars are displayed as such after construction
-  for (char cc = ' '; cc <= '~'; cc++) {
+  for (char cc = 0; cc >= 0; cc++) { // Loop until char overflows
     std::ostringstream os;
     os << ReadKB::Key(cc);
-    st |= testEq(os.str(), std::string(1, cc), "Printable Char Constructor");
+    std::string ans;
+    if (cc < 32)        { ans = asciiUnprintableDisplayNames[cc]; } // C0 Control Codes
+    else if (cc < 127)  { ans = std::string(1, cc); } // Printable ASCII
+    else                { ans = "Bksp"; } // ASCII(127)=DEL
+    st |= testEq(os.str(), ans, "Char Constructor");
   }
 
   // Test Display of Keys with Modifiers
