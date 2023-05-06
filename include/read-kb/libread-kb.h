@@ -90,51 +90,68 @@ class ReadKB {
     };
 
     constexpr KeyValue ascii2key(const char& ascii) {
-      if (ascii >= ' ' && ascii <= '~') {
-        // Printable Characters
-        if ((ascii == ' ') ||
-            (ascii == '\'') ||
-            (ascii >= ',' && ascii <= '9') ||
-            (ascii == ';') ||
-            (ascii == '=') ||
-            (ascii >= 'A' && ascii <= 'Z') ||
-            (ascii >= '`' && ascii <= 'z')
-           ) {
-          // Cast directly from underlying value
-          return static_cast<KeyValue>(ascii);
-        } else if ((ascii == '!') ||
-                   (ascii >= '#' && ascii <= '%')
-                  ) {
-          // Add offset of -0x10
-          return static_cast<KeyValue>(ascii - (1<<4));
-        } else if (ascii >= '[' && ascii <= ']') {
-          // Add offset of 0x20
-          return static_cast<KeyValue>(ascii + (1<<5));
-        } else if (ascii >= '{' && ascii <= '}') {
-          // Add offset of -0x20
-          return static_cast<KeyValue>(ascii - (1<<5));
-        } else {
-          switch (ascii) {
-            case '"': return KeyValue::DoubleQuote; break;
-            case '&': return KeyValue::Ampersand; break;
-            case '(': return KeyValue::LeftParen; break;
-            case ')': return KeyValue::RightParen; break;
-            case '*': return KeyValue::Asterisk; break;
-            case '+': return KeyValue::Plus; break;
-            case ':': return KeyValue::Colon; break;
-            case '<': return KeyValue::LeftAngle; break;
-            case '>': return KeyValue::RightAngle; break;
-            case '?': return KeyValue::Question; break;
-            case '@': return KeyValue::At; break;
-            case '^': return KeyValue::Circumflex; break;
-            case '_': return KeyValue::Underscore; break;
-            case '~': return KeyValue::Tilde; break;
-            default: return KeyValue::UNDEFINED;
-          }
+      // Cast directly from underlying ASCII value (Most Alphanumerics)
+      if ((ascii == ' ') ||
+          (ascii == '\'') ||
+          (ascii >= ',' && ascii <= '9') ||
+          (ascii == ';') ||
+          (ascii == '=') ||
+          (ascii >= 'A' && ascii <= 'Z') ||
+          (ascii >= '`' && ascii <= 'z') ||
+          (ascii == 127) // DEL
+          ) {
+        return static_cast<KeyValue>(ascii);
+
+      // Add offset of 0x160 (Most Control Codes)
+      } else if ((ascii >= 1  && ascii <= 7)  || // SOH - BEL
+                 (ascii >= 11 && ascii <= 26) || // VT - SUB
+                 (ascii >= 28 && ascii <= 29)    // FS - GS
+                ) {
+        return static_cast<KeyValue>(ascii + (1<<8) + (6<<4));
+
+      // Add offset of -0x10 (Few shifted symbols)
+      } else if ((ascii == '!') ||
+                 (ascii >= '#' && ascii <= '%')
+                ) {
+        return static_cast<KeyValue>(ascii - (1<<4));
+
+      // Add offset of 0x20 (Base brackets)
+      } else if (ascii >= '[' && ascii <= ']') {
+        return static_cast<KeyValue>(ascii + (1<<5));
+
+      // Add offset of -0x20 (Shifted brackets)
+      } else if (ascii >= '{' && ascii <= '}') {
+        return static_cast<KeyValue>(ascii - (1<<5));
+
+      // Add offset of 0xE0 (Tab, Enter, Esc)
+      } else if ((ascii >= 9 && ascii <= 10) || // HT - LF
+                 (ascii == 27)) {               // ESC
+        return static_cast<KeyValue>(ascii + (14<<4));
+
+      // Individually Set
+      } else {
+        switch (ascii) {
+          case 0  : return static_cast<KeyValue>(KeyValue::At + static_cast<KeyValue>(Mod::Ctrl)); break;
+          case 8  : return static_cast<KeyValue>(KeyValue::Backspace + static_cast<KeyValue>(Mod::Ctrl)); break;
+          case 30 : return static_cast<KeyValue>(KeyValue::Circumflex + static_cast<KeyValue>(Mod::Ctrl)); break;
+          case 31 : return static_cast<KeyValue>(KeyValue::Underscore + static_cast<KeyValue>(Mod::Ctrl)); break;
+          case '"': return KeyValue::DoubleQuote; break;
+          case '&': return KeyValue::Ampersand; break;
+          case '(': return KeyValue::LeftParen; break;
+          case ')': return KeyValue::RightParen; break;
+          case '*': return KeyValue::Asterisk; break;
+          case '+': return KeyValue::Plus; break;
+          case ':': return KeyValue::Colon; break;
+          case '<': return KeyValue::LeftAngle; break;
+          case '>': return KeyValue::RightAngle; break;
+          case '?': return KeyValue::Question; break;
+          case '@': return KeyValue::At; break;
+          case '^': return KeyValue::Circumflex; break;
+          case '_': return KeyValue::Underscore; break;
+          case '~': return KeyValue::Tilde; break;
+          default : return KeyValue::UNDEFINED;
         }
       }
-      // Unprintable
-      return KeyValue::UNDEFINED;
     }
 
     constexpr Key()

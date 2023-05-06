@@ -88,6 +88,8 @@ The following key names are enumerated, listed with their associated display val
 | Enter        | `Enter`  |
 | Esc          | `Esc`    |
 
+Unnamed enums may be constructed from any 7-bit ASCII character, such as `ReadKB::Key('a')` or `ReadKB::(0)` for unprintable control codes.
+
 ### Bash
 
 ```bash
