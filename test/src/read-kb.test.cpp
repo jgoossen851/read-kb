@@ -14,7 +14,11 @@
 #define ANSI_GRN "\033[32m"
 #define ANSI_RST "\033[0m"
 
-
+// Check that global namespace is not polluted
+enum TestEnum {
+  Enter,
+  UNDEFINED
+};
 
 int main() {
 
@@ -22,10 +26,10 @@ int main() {
   int st = EXIT_SUCCESS;
 
   // Test that Modifiers in a switch compile
-  ReadKB::Combo key = ReadKB::Key::UNDEFINED;
+  ReadKB::Key key = ReadKB::Key::UNDEFINED;
   switch(key) {
-    case static_cast<uint>(ReadKB::Key::Comma): break;
-    // case ReadKB::Key::Period: break; /// @todo Remove static_cast from end usage
+    case ReadKB::Key::Comma: break;
+    case ReadKB::Key::Period: break; /// @todo Remove static_cast from end usage
     case ReadKB::Key::Exclamation & ReadKB::Mod::Shft: break;
     // case ReadKB::Mod::Shft & ReadKB::Key::Equal: break; /// @todo Allow key to be placed last
     case ReadKB::Key::Question & ReadKB::Mod::Ctrl & ReadKB::Mod::Alt : break;

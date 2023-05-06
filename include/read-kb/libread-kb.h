@@ -25,138 +25,103 @@ enum ReadKbMode {
 
 
 class ReadKB {
-  public:
-  // private: /// @todo Make the masks private
-    enum class BitmaskSet : uint { /// @todo Convert class to enum of {5, 6, 7, 8, 9, 16}
-      // When mask is applied with &, the corresponding bits will be set
-      Lowercase = 1<<5,
-      Alpha = 1<<6,
-      Function = 1<<7,
-      Ctrl = 1<<8,
-      Alt = 1<<9,
-      ERROR = 1<<16,
-      UNDEFINED
-    };
-    
-    enum class BitmaskClear : uint {
-      // When mask is applied with &, the corresponding bits will be cleared
-      Shft= static_cast<uint>(BitmaskSet::Lowercase),
-      Number = static_cast<uint>(BitmaskSet::Alpha),
-      ERROR = 1<<16,
-      UNDEFINED
-    };
+ private:
+  enum class BitmaskSet : uint { /// @todo Convert class to enum of {5, 6, 7, 8, 9, 16}
+    // When mask is applied with &, the corresponding bits will be set
+    Lowercase = 1<<5,
+    Alpha     = 1<<6,
+    Function  = 1<<7,
+    Control   = 1<<8,
+    Alternate = 1<<9,
+    ERROR     = 1<<16,
+    UNDEFINED
+  };
+  
+  enum class BitmaskClear : uint {
+    // When mask is applied with &, the corresponding bits will be cleared
+    Shift   = static_cast<uint>(BitmaskSet::Lowercase),
+    Number  = static_cast<uint>(BitmaskSet::Alpha),
+    ERROR   = 1<<16,
+    UNDEFINED
+  };
 
-  public:
-    enum class Key : uint {
+ public:
+  struct Mod {
+    static const BitmaskClear Shft = BitmaskClear::Shift;
+    static const BitmaskSet   Ctrl = BitmaskSet::Control;
+    static const BitmaskSet   Alt  = BitmaskSet::Alternate;
+  };
+
+  /// A combination of a key with potential modifier keys (Shift, Ctrl, Alt)
+  class Key {
+   public:
+    // Unscoped enum to enable implicit conversion to uint
+    enum KeyValue: uint {
       DoubleQuote = 7,
-      LeftAngle = 12,
-      Underscore,
-      RightAngle,
-      Question,
-      RightParen,
-      Exclamation,
-      At,
-      Hash,
-      Dollar,
-      Percent,
-      Circumflex,
-      Ampersand,
-      Asterisk,
-      LeftParen,
-      Colon = 27,
-      Plus = 29,
-      Space = 32,
-      Quote = 39,
-      Comma = 44,
-      Dash,
-      Period,
-      Slash,
-      Semicolon = 59,
-      Equal = 61,
-      Tilde = 64,
-      LeftBrace = 91,
-      Pipe,
-      RightBrace,
-      Grave = 96,
-      LeftBracket = 123,
-      Backslash,
-      RightBracket,
-      Backspace = 127,
-      Insert = 162,
-      Delete,
-      PageUp = 165,
-      PageDown,
-      F1 = 171,
-      F2,
-      F3,
-      F4,
-      F5,
-      F6 = 177,
-      F7,
-      F8,
-      F9,
-      F10,
-      F11,
-      F12,
-      Up = 225,
-      Down,
-      Right,
-      Left,
-      Center,
-      End,
-      Home = 232,
-      Tab,
-      Enter,
-      Esc = 251,
-      ERROR = 1<<16,
+      LeftAngle   = 12,  Underscore, RightAngle, Question,
+                         RightParen, Exclamation, At, Hash, Dollar,
+                         Percent, Circumflex, Ampersand, Asterisk, LeftParen,
+      Colon       = 27,
+      Plus        = 29,
+      Space       = 32,
+      Quote       = 39,
+      Comma       = 44,  Dash, Period, Slash,
+      Semicolon   = 59,
+      Equal       = 61,
+      Tilde       = 64,
+      LeftBrace   = 91,  Pipe, RightBrace,
+      Grave       = 96,
+      LeftBracket = 123, Backslash, RightBracket,
+      Backspace   = 127,
+      Insert      = 162, Delete,
+      PageUp      = 165, PageDown,
+      F1          = 171, F2, F3, F4, F5,
+      F6          = 177, F7, F8, F9, F10, F11, F12,
+      Up          = 225, Down, Right, Left, Center, End,
+      Home        = 232, Tab, Enter,
+      Esc         = 251,
+      ERROR       = 1<<16,
       UNDEFINED_CSI,
       UNDEFINED_SS3,
       UNDEFINED_ESCAPE,
       UNDEFINED
     };
 
-    struct Mod {
-      static const BitmaskClear Shft = BitmaskClear::Shft;
-      static const BitmaskSet  Ctrl = BitmaskSet::Ctrl;
-      static const BitmaskSet  Alt  = BitmaskSet::Alt;
-    };
+    constexpr Key()
+      : mkey(KeyValue::ERROR) {};
+    constexpr Key(const uint key)
+      : mkey(static_cast<KeyValue>(key)) {};
 
-    /// A combination of a key with potential modifier keys (Shift, Ctrl, Alt)
-    struct Combo {
-      constexpr Combo()
-        : mkey(static_cast<uint>(Key::ERROR)) {};
-      constexpr Combo(const uint key)
-        : mkey(key) {};
-      constexpr Combo(const Key key)
-        : mkey(static_cast<uint>(key)) {};
-      constexpr operator uint() {return mkey;}
-      uint mkey;
-    };
+    // Promoter to integral type for use in switch
+    constexpr operator uint() const {return mkey;}
 
-    ReadKB();
-    Combo read_key() const;
-    std::string read_line() const { return "Not yet implemented"; };
-    std::string read_file() const { return "Not yet implemented"; };
+    // Bitwise operators
+    friend constexpr ReadKB::Key operator&(const ReadKB::Key& key, const ReadKB::BitmaskSet& mSet) {
+      return ReadKB::Key(key.mkey | static_cast<uint>(mSet));
+    }
+    friend constexpr ReadKB::Key operator&(const ReadKB::Key& key, const ReadKB::BitmaskClear& mClr) {
+      return ReadKB::Key(key.mkey & ~static_cast<uint>(mClr));
+    }
 
-  private:
-    ReadKbMode mode_ = KB_CHAR;
-    struct pollfd *pfds;
-    #if DEBUG_LIB_READ_KB == 1
-      FILE* g_pDebugLogFile;
-    #endif
+    friend std::ostream& operator<<(std::ostream& os, const ReadKB::Key& kb);
 
-    Combo categorizeBuffer(const u_char *buf, const ssize_t len) const;
+   private:
+    KeyValue mkey;
+  };
+
+  ReadKB();
+  Key read_key() const;
+  std::string read_line() const { return "Not yet implemented"; };
+  std::string read_file() const { return "Not yet implemented"; };
+
+ private:
+  ReadKbMode mode_ = KB_CHAR;
+  struct pollfd *pfds;
+  #if DEBUG_LIB_READ_KB == 1
+    FILE* g_pDebugLogFile;
+  #endif
+
+  Key categorizeBuffer(const u_char *buf, const ssize_t len) const;
 };
-
-/// @todo Make friend of ReadKb::Combo while maintaining automatic promotion of ReadKb::Key
-// Bitwise operators
-constexpr ReadKB::Combo operator&(const ReadKB::Combo& key, const ReadKB::BitmaskSet& mSet) {
-  return ReadKB::Combo(key.mkey | static_cast<uint>(mSet));
-}
-constexpr ReadKB::Combo operator&(const ReadKB::Combo& key, const ReadKB::BitmaskClear& mClr) {
-  return ReadKB::Combo(key.mkey & ~static_cast<uint>(mClr));
-}
-
-std::ostream& operator<<(std::ostream& os, const ReadKB::Combo& kb);
 
 #endif // LIBREAD_KB_H
