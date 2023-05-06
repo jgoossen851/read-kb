@@ -37,8 +37,7 @@ class ReadKB {
   std::string read_line() const { return "Not yet implemented"; };
   std::string read_file() const { return "Not yet implemented"; };
 
-  void setInputMode(const int &fd, const InputMode &mode);
-  void setInputFile(const int &fd);
+  void setInput(const int &fd, const InputMode &mode);
 
  private:
   enum class BitmaskSet : uint { /// @todo Convert class to enum of {5, 6, 7, 8, 9, 16}

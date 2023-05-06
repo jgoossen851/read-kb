@@ -127,15 +127,12 @@ ReadKB::ReadKB() {
     g_pDebugLogFile = fopen ("/tmp/read-kb-debug-log.txt", "w");
   #endif
 
-  // Set input mode to get single characters
-  setInputMode(STDIN_FD, InputMode::Char);
-
   // Allocate memory for file descriptor for the poll command
   pfds = static_cast<pollfd*>(calloc(1, sizeof(struct pollfd)));
   errorIf(pfds == NULL, "malloc");
 
-  // Assign file descriptor to poll structure
-  setInputFile(STDIN_FD);
+  // Get single characters and assign file descriptor to poll structure
+  setInput(STDIN_FD, InputMode::Char);
 
   // Request poll() to scan file descriptor for data available to read (POLLIN signal)
   pfds->events = POLLIN;
@@ -199,7 +196,7 @@ void ReadKB::resetTerminal(const int fd) {
   errorIf(tcsetattr(fd, TCSANOW, &term) == -1, "termios reset");
 }
 
-void ReadKB::setInputMode(const int &fd, const InputMode &mode) {
+void ReadKB::setInput(const int &fd, const InputMode &mode) {
   switch (mode) {
     case InputMode::Char :
       // Turn off OS buffering on standard input (non-canonical mode)
@@ -217,9 +214,7 @@ void ReadKB::setInputMode(const int &fd, const InputMode &mode) {
       break;
   }
   mode_ = mode;
-}
 
-void ReadKB::setInputFile(const int &fd) {
   // Assign file descriptor to poll structure
   pfds->fd = fd;
   errorIf(pfds->fd == -1, "open");
