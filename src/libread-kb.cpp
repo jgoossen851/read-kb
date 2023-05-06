@@ -56,10 +56,10 @@ std::ostream& operator<<(std::ostream& os, const ReadKB::Key& kb) {
       case ReadKB::Key::Circumflex   : os << "^";      break;
       case ReadKB::Key::Ampersand    : os << "&";      break;
       case ReadKB::Key::Asterisk     : os << "*";      break;
-      case ReadKB::Key::LeftParen    : os << ")";      break;
+      case ReadKB::Key::LeftParen    : os << "(";      break;
       case ReadKB::Key::Colon        : os << ":";      break;
       case ReadKB::Key::Plus         : os << "+";      break;
-      case ReadKB::Key::Space        : os << "";       break;
+      case ReadKB::Key::Space        : os << " ";      break;
       case ReadKB::Key::Quote        : os << "'";      break;
       case ReadKB::Key::Comma        : os << ",";      break;
       case ReadKB::Key::Dash         : os << "-";      break;

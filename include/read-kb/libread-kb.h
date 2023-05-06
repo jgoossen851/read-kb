@@ -88,25 +88,73 @@ class ReadKB {
       UNDEFINED
     };
 
+    constexpr KeyValue ascii2key(const char& ascii) {
+      if (ascii >= ' ' && ascii <= '~') {
+        // Printable Characters
+        if ((ascii == ' ') ||
+            (ascii == '\'') ||
+            (ascii >= ',' && ascii <= '9') ||
+            (ascii == ';') ||
+            (ascii == '=') ||
+            (ascii >= 'A' && ascii <= 'Z') ||
+            (ascii >= '`' && ascii <= 'z')
+           ) {
+          // Cast directly from underlying value
+          return static_cast<KeyValue>(ascii);
+        } else if ((ascii == '!') ||
+                   (ascii >= '#' && ascii <= '%')
+                  ) {
+          // Add offset of -0x10
+          return static_cast<KeyValue>(ascii - (1<<4));
+        } else if (ascii >= '[' && ascii <= ']') {
+          // Add offset of 0x20
+          return static_cast<KeyValue>(ascii + (1<<5));
+        } else if (ascii >= '{' && ascii <= '}') {
+          // Add offset of -0x20
+          return static_cast<KeyValue>(ascii - (1<<5));
+        } else {
+          switch (ascii) {
+            case '"': return KeyValue::DoubleQuote; break;
+            case '&': return KeyValue::Ampersand; break;
+            case '(': return KeyValue::LeftParen; break;
+            case ')': return KeyValue::RightParen; break;
+            case '*': return KeyValue::Asterisk; break;
+            case '+': return KeyValue::Plus; break;
+            case ':': return KeyValue::Colon; break;
+            case '<': return KeyValue::LeftAngle; break;
+            case '>': return KeyValue::RightAngle; break;
+            case '?': return KeyValue::Question; break;
+            case '@': return KeyValue::At; break;
+            case '^': return KeyValue::Circumflex; break;
+            case '_': return KeyValue::Underscore; break;
+            case '~': return KeyValue::Tilde; break;
+            default: return KeyValue::UNDEFINED;
+          }
+        }
+      }
+      // Unprintable
+      return KeyValue::UNDEFINED;
+    }
+
     constexpr Key()
       : mkey(KeyValue::ERROR) {};
     constexpr Key(const uint &key)
       : mkey(static_cast<KeyValue>(key)) {};
     constexpr Key(const char &key)
-      : mkey(static_cast<KeyValue>(key)) {};
+      : mkey(ascii2key(key)) {};
 
     // Promoter to integral type for use in switch
     constexpr operator uint() const {return static_cast<uint>(mkey);}
 
     // Bitwise operators
-    friend constexpr ReadKB::Key operator&(const ReadKB::Key& key, const ReadKB::BitmaskSet& mSet) {
-      return ReadKB::Key(key | static_cast<uint>(mSet));
+    friend constexpr Key operator&(const Key& key, const BitmaskSet& mSet) {
+      return Key(key | static_cast<uint>(mSet));
     }
-    friend constexpr ReadKB::Key operator&(const ReadKB::Key& key, const ReadKB::BitmaskClear& mClr) {
-      return ReadKB::Key(key & ~static_cast<uint>(mClr));
+    friend constexpr Key operator&(const Key& key, const BitmaskClear& mClr) {
+      return Key(key & ~static_cast<uint>(mClr));
     }
 
-    friend std::ostream& operator<<(std::ostream& os, const ReadKB::Key& kb);
+    friend std::ostream& operator<<(std::ostream& os, const Key& kb);
 
    private:
     KeyValue mkey;
