@@ -31,7 +31,7 @@ int main() {
   auto dictionary = InitializeMap();
   ReadKB kb;
 
-  ReadKB::Key key;
+  ReadKB::Combo key;
   while(true) {
     key = kb.read_key();
     std::cout << "[" << key << "]" << std::flush;

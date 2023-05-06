@@ -26,20 +26,30 @@ enum ReadKbMode {
 
 class ReadKB {
   public:
-    enum class Mod : uint {
-      _Lowercase = 1<<5,
-      Shft= ~_Lowercase,
-      _Alpha = 1<<6,
-      _Number = ~_Alpha,
-      _Function = 1<<7,
+  // private: /// @todo Make the masks private
+    enum class BitmaskSet : uint { /// @todo Convert class to enum of {5, 6, 7, 8, 9, 16}
+      // When mask is applied with &, the corresponding bits will be set
+      Lowercase = 1<<5,
+      Alpha = 1<<6,
+      Function = 1<<7,
       Ctrl = 1<<8,
       Alt = 1<<9,
+      ERROR = 1<<16,
+      UNDEFINED
+    };
+    
+    enum class BitmaskClear : uint {
+      // When mask is applied with &, the corresponding bits will be cleared
+      Shft= static_cast<uint>(BitmaskSet::Lowercase),
+      Number = static_cast<uint>(BitmaskSet::Alpha),
+      ERROR = 1<<16,
       UNDEFINED
     };
 
+  public:
     enum class Key : uint {
-      DoubleQuote,
-      LeftAngle,
+      DoubleQuote = 7,
+      LeftAngle = 12,
       Underscore,
       RightAngle,
       Question,
@@ -53,60 +63,78 @@ class ReadKB {
       Ampersand,
       Asterisk,
       LeftParen,
-      Colon,
-      Plus,
-      Space,
-      Quote,
-      Comma,
+      Colon = 27,
+      Plus = 29,
+      Space = 32,
+      Quote = 39,
+      Comma = 44,
       Dash,
       Period,
       Slash,
-      Semicolon,
-      Equal,
-      Tilde,
-      LeftBrace,
+      Semicolon = 59,
+      Equal = 61,
+      Tilde = 64,
+      LeftBrace = 91,
       Pipe,
       RightBrace,
-      Grave,
-      LeftBracket,
+      Grave = 96,
+      LeftBracket = 123,
       Backslash,
       RightBracket,
-      Backspace,
-      Insert,
+      Backspace = 127,
+      Insert = 162,
       Delete,
-      PageUp,
+      PageUp = 165,
       PageDown,
-      F1,
+      F1 = 171,
       F2,
       F3,
       F4,
       F5,
-      F6,
+      F6 = 177,
       F7,
       F8,
       F9,
       F10,
       F11,
       F12,
-      Up,
+      Up = 225,
       Down,
       Right,
       Left,
       Center,
       End,
-      Home,
+      Home = 232,
       Tab,
       Enter,
-      Esc,
+      Esc = 251,
+      ERROR = 1<<16,
       UNDEFINED_CSI,
       UNDEFINED_SS3,
       UNDEFINED_ESCAPE,
-      UNDEFINED,
-      ERROR
+      UNDEFINED
+    };
+
+    struct Mod {
+      static const BitmaskClear Shft = BitmaskClear::Shft;
+      static const BitmaskSet  Ctrl = BitmaskSet::Ctrl;
+      static const BitmaskSet  Alt  = BitmaskSet::Alt;
+    };
+
+    /// A combination of a key with potential modifier keys (Shift, Ctrl, Alt)
+    struct Combo {
+      constexpr Combo()
+        : mkey(static_cast<uint>(Key::ERROR)) {};
+      constexpr Combo(const uint key)
+        : mkey(key) {};
+      constexpr Combo(const Key key)
+        : mkey(static_cast<uint>(key)) {};
+      constexpr operator uint() {return mkey;}
+      uint mkey;
     };
 
     ReadKB();
-    Key read_key() const;
+    Combo read_key() const;
     std::string read_line() const { return "Not yet implemented"; };
     std::string read_file() const { return "Not yet implemented"; };
 
@@ -117,33 +145,18 @@ class ReadKB {
       FILE* g_pDebugLogFile;
     #endif
 
-    Key categorizeBuffer(const u_char *buf, const ssize_t len) const;
+    Combo categorizeBuffer(const u_char *buf, const ssize_t len) const;
 };
 
-// Bitwise logical operators
-constexpr ReadKB::Mod operator&(const ReadKB::Mod& m1, const ReadKB::Mod& m2) {
-  return static_cast<ReadKB::Mod>( static_cast<uint>(m1) & static_cast<uint>(m2));
+/// @todo Make friend of ReadKb::Combo while maintaining automatic promotion of ReadKb::Key
+// Bitwise operators
+constexpr ReadKB::Combo operator&(const ReadKB::Combo& key, const ReadKB::BitmaskSet& mSet) {
+  return ReadKB::Combo(key.mkey | static_cast<uint>(mSet));
 }
-constexpr ReadKB::Mod operator|(const ReadKB::Mod& m1, const ReadKB::Mod& m2) {
-  return static_cast<ReadKB::Mod>( static_cast<uint>(m1) | static_cast<uint>(m2));
-}
-constexpr ReadKB::Mod operator~(const ReadKB::Mod& mod) {
-  return static_cast<ReadKB::Mod>( ~static_cast<uint>(mod));
+constexpr ReadKB::Combo operator&(const ReadKB::Combo& key, const ReadKB::BitmaskClear& mClr) {
+  return ReadKB::Combo(key.mkey & ~static_cast<uint>(mClr));
 }
 
-constexpr ReadKB::Key operator&(const ReadKB::Mod& mod, const ReadKB::Key& key) {
-  return static_cast<ReadKB::Key>( static_cast<uint>(mod) & static_cast<uint>(key) );
-}
-constexpr ReadKB::Key operator&(const ReadKB::Key& key, const ReadKB::Mod& mod) {
-  return mod & key;
-}
-constexpr ReadKB::Key operator|(const ReadKB::Mod& mod, const ReadKB::Key& key) {
-  return static_cast<ReadKB::Key>( static_cast<uint>(mod) | static_cast<uint>(key) );
-}
-constexpr ReadKB::Key operator|(const ReadKB::Key& key, const ReadKB::Mod& mod) {
-  return mod | key;
-}
-
-std::ostream& operator<<(std::ostream& os, const ReadKB::Key kb);
+std::ostream& operator<<(std::ostream& os, const ReadKB::Combo& kb);
 
 #endif // LIBREAD_KB_H

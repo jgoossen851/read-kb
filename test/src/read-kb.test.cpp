@@ -22,10 +22,13 @@ int main() {
   int st = EXIT_SUCCESS;
 
   // Test that Modifiers in a switch compile
-  ReadKB::Key key = ReadKB::Key::UNDEFINED;
+  ReadKB::Combo key = ReadKB::Key::UNDEFINED;
   switch(key) {
+    case static_cast<uint>(ReadKB::Key::Comma): break;
+    // case ReadKB::Key::Period: break; /// @todo Remove static_cast from end usage
     case ReadKB::Key::Exclamation & ReadKB::Mod::Shft: break;
-    case ReadKB::Mod::Ctrl & ReadKB::Mod::Alt & ReadKB::Key::Question: break;
+    // case ReadKB::Mod::Shft & ReadKB::Key::Equal: break; /// @todo Allow key to be placed last
+    case ReadKB::Key::Question & ReadKB::Mod::Ctrl & ReadKB::Mod::Alt : break;
     default: break;
   }
 
