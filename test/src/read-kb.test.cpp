@@ -15,10 +15,19 @@
 #define ANSI_RST "\033[0m"
 
 
+
 int main() {
 
   // Initialize exit status
   int st = EXIT_SUCCESS;
+
+  // Test that Modifiers in a switch compile
+  ReadKB::Key key = ReadKB::Key::UNDEFINED;
+  switch(key) {
+    case ReadKB::Key::Exclamation & ReadKB::Mod::Shft: break;
+    case ReadKB::Mod::Ctrl & ReadKB::Mod::Alt & ReadKB::Key::Question: break;
+    default: break;
+  }
 
   // Display Test Status
   std::cout << (st ? ANSI_RED : ANSI_GRN)

@@ -26,7 +26,18 @@ enum ReadKbMode {
 
 class ReadKB {
   public:
-    enum class Key {
+    enum class Mod : uint {
+      _Lowercase = 1<<5,
+      Shft= ~_Lowercase,
+      _Alpha = 1<<6,
+      _Number = ~_Alpha,
+      _Function = 1<<7,
+      Ctrl = 1<<8,
+      Alt = 1<<9,
+      UNDEFINED
+    };
+
+    enum class Key : uint {
       DoubleQuote,
       LeftAngle,
       Underscore,
@@ -108,6 +119,30 @@ class ReadKB {
 
     Key categorizeBuffer(const u_char *buf, const ssize_t len) const;
 };
+
+// Bitwise logical operators
+constexpr ReadKB::Mod operator&(const ReadKB::Mod& m1, const ReadKB::Mod& m2) {
+  return static_cast<ReadKB::Mod>( static_cast<uint>(m1) & static_cast<uint>(m2));
+}
+constexpr ReadKB::Mod operator|(const ReadKB::Mod& m1, const ReadKB::Mod& m2) {
+  return static_cast<ReadKB::Mod>( static_cast<uint>(m1) | static_cast<uint>(m2));
+}
+constexpr ReadKB::Mod operator~(const ReadKB::Mod& mod) {
+  return static_cast<ReadKB::Mod>( ~static_cast<uint>(mod));
+}
+
+constexpr ReadKB::Key operator&(const ReadKB::Mod& mod, const ReadKB::Key& key) {
+  return static_cast<ReadKB::Key>( static_cast<uint>(mod) & static_cast<uint>(key) );
+}
+constexpr ReadKB::Key operator&(const ReadKB::Key& key, const ReadKB::Mod& mod) {
+  return mod & key;
+}
+constexpr ReadKB::Key operator|(const ReadKB::Mod& mod, const ReadKB::Key& key) {
+  return static_cast<ReadKB::Key>( static_cast<uint>(mod) | static_cast<uint>(key) );
+}
+constexpr ReadKB::Key operator|(const ReadKB::Key& key, const ReadKB::Mod& mod) {
+  return mod | key;
+}
 
 std::ostream& operator<<(std::ostream& os, const ReadKB::Key kb);
 
