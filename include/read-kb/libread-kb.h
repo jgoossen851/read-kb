@@ -89,6 +89,7 @@ class ReadKB {
       UNDEFINED
     };
 
+   private:
     constexpr KeyValue ascii2key(const char& ascii) {
       // Cast directly from underlying ASCII value (Most Alphanumerics)
       if ((ascii == ' ') ||
@@ -154,6 +155,7 @@ class ReadKB {
       }
     }
 
+   public:
     constexpr Key()
       : mkey(KeyValue::ERROR) {};
     constexpr Key(const uint &key)
@@ -172,6 +174,9 @@ class ReadKB {
       return Key(key & ~static_cast<uint>(mClr));
     }
 
+    friend std::ostream& operator<<(std::ostream& os, const Key& kb);
+
+   private:
     constexpr Key& unsetMask(const BitmaskSet mSet) {
       /// @todo Clear mask in place
       mkey = static_cast<KeyValue>(mkey & ~static_cast<uint>(mSet));
@@ -182,8 +187,6 @@ class ReadKB {
       mkey = static_cast<KeyValue>(mkey | static_cast<uint>(mClr));
       return *this;
     }
-
-    friend std::ostream& operator<<(std::ostream& os, const Key& kb);
 
    private:
     KeyValue mkey;
