@@ -17,16 +17,16 @@
 // use `tail -f "/tmp/read-kb-debug-log.txt"` from a terminal to see debug messages
 #define DEBUG_LIB_READ_KB 0
 
-enum ReadKbMode {
-  KB_CHAR,
-  KB_LINE,
-  KB_FILE
-};
-
-
 class ReadKB {
  public:
+  enum class InputMode {
+    Char,
+    Line,
+    File
+  };
+
   ReadKB();
+  ~ReadKB();
 
   /// A standalone key or combination of a key with potential modifier keys (Shift, Ctrl, Alt)
   class Key;
@@ -37,6 +37,7 @@ class ReadKB {
   std::string read_line() const { return "Not yet implemented"; };
   std::string read_file() const { return "Not yet implemented"; };
 
+  void setInputMode(const int &fd, const InputMode &mode);
   void setInputFile(const int &fd);
 
  private:
@@ -59,12 +60,13 @@ class ReadKB {
     UNDEFINED
   };
 
-  ReadKbMode mode_ = KB_CHAR;
+  InputMode mode_ = InputMode::Char;
   struct pollfd *pfds;
   #if DEBUG_LIB_READ_KB == 1
     FILE* g_pDebugLogFile;
   #endif
 
+  void resetTerminal(const int fd);
   Key categorizeBuffer(const u_char *buf, const ssize_t len) const;
 };
 

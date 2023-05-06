@@ -127,12 +127,8 @@ ReadKB::ReadKB() {
     g_pDebugLogFile = fopen ("/tmp/read-kb-debug-log.txt", "w");
   #endif
 
-  // Turn off OS buffering on standard input (non-canonical mode)
-  struct termios term;
-  tcgetattr(STDIN_FD, &term);
-  term.c_lflag &= ~ICANON; // Non-canonical mode
-  term.c_lflag &= ~ECHO; // Do not print input
-  tcsetattr(STDIN_FD, TCSANOW, &term);
+  // Set input mode to get single characters
+  setInputMode(STDIN_FD, InputMode::Char);
 
   // Allocate memory for file descriptor for the poll command
   pfds = static_cast<pollfd*>(calloc(1, sizeof(struct pollfd)));
@@ -143,6 +139,10 @@ ReadKB::ReadKB() {
 
   // Request poll() to scan file descriptor for data available to read (POLLIN signal)
   pfds->events = POLLIN;
+}
+
+ReadKB::~ReadKB() {
+  resetTerminal(STDIN_FD);
 }
 
 ReadKB::Key ReadKB::read_key() const {
@@ -189,6 +189,34 @@ ReadKB::Key ReadKB::read_key() const {
     }
   }
   return key_pressed;
+}
+
+void ReadKB::resetTerminal(const int fd) {
+  struct termios term;
+  tcgetattr(fd, &term);
+  term.c_lflag |= ICANON; // Canonical mode
+  term.c_lflag |= ECHO;   // Print input
+  errorIf(tcsetattr(fd, TCSANOW, &term) == -1, "termios reset");
+}
+
+void ReadKB::setInputMode(const int &fd, const InputMode &mode) {
+  switch (mode) {
+    case InputMode::Char :
+      // Turn off OS buffering on standard input (non-canonical mode)
+      struct termios term;
+      tcgetattr(fd, &term);
+      term.c_lflag &= ~ICANON; // Non-canonical mode
+      term.c_lflag &= ~ECHO;   // Do not print input
+      errorIf(tcsetattr(fd, TCSANOW, &term) == -1, "termios");
+      break;
+    case InputMode::Line :
+      resetTerminal(fd);
+      break;
+    case InputMode::File :
+      resetTerminal(fd);
+      break;
+  }
+  mode_ = mode;
 }
 
 void ReadKB::setInputFile(const int &fd) {

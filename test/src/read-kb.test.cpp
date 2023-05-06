@@ -121,6 +121,9 @@ int main() {
     default: break;
   }
 
+  // Test main class constructor
+  ReadKB kb;
+
   // Display Test Status
   std::cout << (st ? ANSI_RED : ANSI_GRN)
             << std::string(15, '#')
