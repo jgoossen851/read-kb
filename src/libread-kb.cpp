@@ -139,9 +139,7 @@ ReadKB::ReadKB() {
   errorIf(pfds == NULL, "malloc");
 
   // Assign file descriptor to poll structure
-  pfds->fd = STDIN_FD;
-  errorIf(pfds->fd == -1, "open");
-  printlog("Opened \"%s\" on fd %d\n", "stdin", pfds->fd);
+  setInputFile(STDIN_FD);
 
   // Request poll() to scan file descriptor for data available to read (POLLIN signal)
   pfds->events = POLLIN;
@@ -191,6 +189,13 @@ ReadKB::Key ReadKB::read_key() const {
     }
   }
   return key_pressed;
+}
+
+void ReadKB::setInputFile(const int &fd) {
+  // Assign file descriptor to poll structure
+  pfds->fd = fd;
+  errorIf(pfds->fd == -1, "open");
+  printlog("Reading input from fd %d\n", pfds->fd);
 }
 
 

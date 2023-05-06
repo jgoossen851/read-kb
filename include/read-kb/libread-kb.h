@@ -37,6 +37,8 @@ class ReadKB {
   std::string read_line() const { return "Not yet implemented"; };
   std::string read_file() const { return "Not yet implemented"; };
 
+  void setInputFile(const int &fd);
+
  private:
   enum class BitmaskSet : uint { /// @todo Convert class to enum of {5, 6, 7, 8, 9, 16}
     // When mask is applied with &, the corresponding bits will be set
