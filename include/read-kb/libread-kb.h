@@ -30,7 +30,7 @@ class ReadKB {
     // When mask is applied with &, the corresponding bits will be set
     Lowercase = 1<<5,
     Alpha     = 1<<6,
-    Function  = 1<<7,
+    Event     = 1<<7,
     Control   = 1<<8,
     Alternate = 1<<9,
     ERROR     = 1<<16,
@@ -48,9 +48,10 @@ class ReadKB {
  public:
   /// Modifier keys that can be combined via & operator with a ReadKB::Key
   struct Mod {
-    static const BitmaskClear Shft = BitmaskClear::Shift;
-    static const BitmaskSet   Ctrl = BitmaskSet::Control;
-    static const BitmaskSet   Alt  = BitmaskSet::Alternate;
+    static const BitmaskClear Shft  = BitmaskClear::Shift;
+    static const BitmaskSet   Ctrl  = BitmaskSet::Control;
+    static const BitmaskSet   Alt   = BitmaskSet::Alternate;
+    static const BitmaskSet   Event = BitmaskSet::Event;
   };
 
   /// A standalone key or combination of a key with potential modifier keys (Shift, Ctrl, Alt)
@@ -152,6 +153,17 @@ class ReadKB {
     }
     friend constexpr Key operator&(const Key& key, const BitmaskClear mClr) {
       return Key(key & ~static_cast<uint>(mClr));
+    }
+
+    constexpr Key& unsetMask(const BitmaskSet mSet) {
+      /// @todo Clear mask in place
+      mkey = static_cast<KeyValue>(mkey & ~static_cast<uint>(mSet));
+      return *this;
+    }
+    constexpr Key& unsetMask(const BitmaskClear mClr) {
+      /// @todo Clear mask in place
+      mkey = static_cast<KeyValue>(mkey | static_cast<uint>(mClr));
+      return *this;
     }
 
     friend std::ostream& operator<<(std::ostream& os, const Key& kb);

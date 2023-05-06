@@ -19,7 +19,7 @@ First make the `install` target.
 
 ### C++
 
-Values are returned as a `ReadKb::Key` class. Key values are provided as an unscoped enum within the class.
+Values are returned as a `ReadKB::Key` class. Key values are provided as an unscoped enum within the class.
 Objects of the `ReadKB::Key` class can be promoted to an integral type and can therefore be used in a `switch` statement.
 The output stream operator `<<` is also defined for the class to return the key's display name.
 A key in the `ReadKB::Key` class may be modified by modifier keys in the `ReadKB::Mod` class using the bitwise "and" operator (`&`).

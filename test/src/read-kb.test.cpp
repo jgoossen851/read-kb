@@ -54,6 +54,21 @@ int main() {
     st |= testEq(os.str(), std::string(1, cc), "Printable Char Constructor");
   }
 
+  // Test Display of Keys with Modifiers
+  for (char cc = ' '; cc <= '~'; cc++) {
+    std::ostringstream osCtrl;
+    osCtrl << (ReadKB::Key(cc) & ReadKB::Mod::Ctrl);
+    st |= testEq(osCtrl.str(), "Ctrl-" + std::string(1, cc), "Display with Ctrl Mod");
+
+    std::ostringstream osAlt;
+    osAlt << (ReadKB::Key(cc) & ReadKB::Mod::Alt);
+    st |= testEq(osAlt.str(), "Alt-" + std::string(1, cc), "Display with Alt Mod");
+
+    std::ostringstream osCtrlAlt;
+    osCtrlAlt << (ReadKB::Key(cc) & ReadKB::Mod::Ctrl & ReadKB::Mod::Alt);
+    st |= testEq(osCtrlAlt.str(), "Ctrl-Alt-" + std::string(1, cc), "Display with Ctrl-Alt Mod");
+  }
+
   // Test that Modifiers in a switch compile
   ReadKB::Key key = ReadKB::Key::UNDEFINED;
   switch(key) {

@@ -33,8 +33,15 @@
 #define STDIN_FD 0 // Standard input file descriptor
 #define BUFF_SIZE_CHARS 8 // Unicode less than 5 bytes and longest ANSI sequence (that I know of) is of the form e[nn;n~
 
+std::ostream& operator<<(std::ostream& os, const ReadKB::Key& kbMods) {
+  // Remove modifiers and add to output stream
+  ReadKB::Key kb = kbMods;
+  if(kb != kb.unsetMask(ReadKB::Mod::Ctrl)) { os << "Ctrl-"; }
+  if(kb != kb.unsetMask(ReadKB::Mod::Alt))  { os << "Alt-"; }
+  if(kb == (kb & ReadKB::Mod::Event) &&
+     kb != kb.unsetMask(ReadKB::Mod::Shft)) { os << "Shft-"; }
 
-std::ostream& operator<<(std::ostream& os, const ReadKB::Key& kb) {
+  // Decode base key
   if ((kb >= static_cast<uint>('a') && kb <= static_cast<uint>('z')) ||
       (kb >= static_cast<uint>('A') && kb <= static_cast<uint>('Z')) ||
       (kb >= static_cast<uint>('0') && kb <= static_cast<uint>('9'))) {
@@ -102,12 +109,13 @@ std::ostream& operator<<(std::ostream& os, const ReadKB::Key& kb) {
       case ReadKB::Key::Tab          : os << "Tab";    break;
       case ReadKB::Key::Enter        : os << "Enter";  break;
       case ReadKB::Key::Esc          : os << "Esc";    break;
-      // Error Codes ASCII
-      case static_cast<uint>(ReadKB::Key::UNDEFINED_CSI) : os << "Undef CSI"; break;
-      case static_cast<uint>(ReadKB::Key::UNDEFINED_SS3) : os << "Undef SS3"; break;
-      case static_cast<uint>(ReadKB::Key::UNDEFINED_ESCAPE) : os << "Undef Esc"; break;
-      case static_cast<uint>(ReadKB::Key::UNDEFINED) : os << "Undefined"; break;
-      case static_cast<uint>(ReadKB::Key::ERROR) : os << "Error"; break;
+      // Error Codes
+      case ReadKB::Key::UNDEFINED_CSI    : os << "Undef CSI"; break;
+      case ReadKB::Key::UNDEFINED_SS3    : os << "Undef SS3"; break;
+      case ReadKB::Key::UNDEFINED_ESCAPE : os << "Undef Esc"; break;
+      case ReadKB::Key::UNDEFINED        : os << "Undefined"; break;
+      case ReadKB::Key::ERROR            : os << "Error";     break;
+      default : os << "Error"; break;
     }
   }
   return os;
