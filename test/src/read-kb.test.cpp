@@ -7,6 +7,9 @@
 
 #include "libread-kb.h"
 
+#include <fcntl.h>
+#include <unistd.h>
+
 #include <iostream>
 #include <sstream>
 #include <string>
@@ -18,6 +21,11 @@
 
 #define U_LA "\u27e8" //!> Left Angle Bracket
 #define U_RA "\u27e9" //!> Right Angle Bracket
+
+// Define error-handling function
+#define errorIf(cond, msg) do { if( cond ) { \
+                                  perror(msg); exit(EXIT_FAILURE); \
+                              }} while (0)
 
 // Check that global namespace is not polluted
 enum TestEnum {
@@ -121,10 +129,34 @@ int main() {
     default: break;
   }
 
-  // Test main class constructor
+  // Test reading input from a file
+  char path[] = "../../../test/res/input.txt";
+  // char path[] = "/tmp/read-kb";
+  // O_TMPFILE  O_TRUNC
+  int fd = open(path, O_RDWR | O_TRUNC, S_IRUSR | S_IWUSR );
+  errorIf(fd == -1, "open");
+
   ReadKB kb;
 
-  // Display Test Status
+  // Check that input source can be switched to file and back again
+  kb.setInput(fd, ReadKB::InputMode::Char);
+  kb.setInput(0, ReadKB::InputMode::Char);
+
+  // Read input from file
+  kb.setInput(fd, ReadKB::InputMode::Char);
+  char buf[] = "abcdefghijklmnopqrstuvwxyz";
+  ssize_t s;
+
+  for (int ii = 0; ii < 10; ii++) {
+    errorIf((s = write(fd, buf + ii, 1)) == -1, "write");
+    errorIf(lseek(fd, -s, SEEK_CUR) == -1, "lseek");
+    key = kb.read_key();
+    std::ostringstream os;
+    os << key;
+    st |= testEq(os.str(), std::string(1, buf[ii]), "Read input from file");
+  }
+
+  // Display Test Statuses
   std::cout << (st ? ANSI_RED : ANSI_GRN)
             << std::string(15, '#')
             << " Tests " << (st ? "Failed!" : "Passed!") << " "

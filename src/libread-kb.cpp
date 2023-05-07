@@ -12,6 +12,7 @@
 #include <unistd.h>
 
 #include <cassert>
+#include <cerrno>
 #include <cstdio>
 #include <fstream>
 #include <iostream>
@@ -170,14 +171,14 @@ ReadKB::Key ReadKB::read_key() const {
 
         ssize_t s = read(pfds->fd, buf, sizeof(buf));
         errorIf(s == -1, "read");
-        errorIf(s + 1 > BUFF_SIZE_CHARS, "read buffer overflow");
+        errorIf(s + 1 > BUFF_SIZE_CHARS && (errno = ENOBUFS), "read");
         printlog("    read %zd bytes: \033[1m", s);
         for (int ii = 0; ii < s; ii++) {
           printlog("%d  ", (uint)buf[ii]);
         }
         printlog("\033[0m\n");
 
-        key_pressed = categorizeBuffer(buf, s);
+        key_pressed = s > 0 ? categorizeBuffer(buf, s) : ReadKB::Key::ERROR;
 
       } else {
         // Process other signals (POLLERR | POLLHUP | POLLNVAL)
@@ -190,21 +191,27 @@ ReadKB::Key ReadKB::read_key() const {
 
 void ReadKB::resetTerminal(const int fd) {
   struct termios term;
-  tcgetattr(fd, &term);
-  term.c_lflag |= ICANON; // Canonical mode
-  term.c_lflag |= ECHO;   // Print input
-  errorIf(tcsetattr(fd, TCSANOW, &term) == -1, "termios reset");
+  if(tcgetattr(fd, &term) == 0) {
+    term.c_lflag |= ICANON; // Canonical mode
+    term.c_lflag |= ECHO;   // Print input
+    errorIf(tcsetattr(fd, TCSANOW, &term) == -1, "termios reset");
+  }
 }
 
 void ReadKB::setInput(const int &fd, const InputMode &mode) {
+  // Reset original file descriptor
+  resetTerminal(pfds->fd);
+
+  // Set new mode
   switch (mode) {
     case InputMode::Char :
       // Turn off OS buffering on standard input (non-canonical mode)
       struct termios term;
-      tcgetattr(fd, &term);
-      term.c_lflag &= ~ICANON; // Non-canonical mode
-      term.c_lflag &= ~ECHO;   // Do not print input
-      errorIf(tcsetattr(fd, TCSANOW, &term) == -1, "termios");
+      if(tcgetattr(fd, &term) == 0) {
+        term.c_lflag &= ~ICANON; // Non-canonical mode
+        term.c_lflag &= ~ECHO;   // Do not print input
+        errorIf(tcsetattr(fd, TCSANOW, &term) == -1, "termios");
+      }
       break;
     case InputMode::Line :
       resetTerminal(fd);
