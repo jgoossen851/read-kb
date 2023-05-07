@@ -10,10 +10,13 @@
 #include <fcntl.h>
 #include <unistd.h>
 
+#include <fstream>
 #include <iostream>
 #include <sstream>
 #include <string>
 #include <map>
+#include <utility>
+#include <vector>
 
 #define ANSI_RED "\033[31m"
 #define ANSI_GRN "\033[32m"
@@ -129,12 +132,25 @@ int main() {
     default: break;
   }
 
-  // Test reading input from a file
-  char path[] = "../../../test/res/input.txt";
-  // char path[] = "/tmp/read-kb";
-  // O_TMPFILE  O_TRUNC
-  int fd = open(path, O_RDWR | O_TRUNC, S_IRUSR | S_IWUSR );
-  errorIf(fd == -1, "open");
+
+  // Load test data set
+  std::ifstream datafile("../../../test/res/input.txt");
+  std::vector<std::pair<std::string, std::string>> data;
+  errorIf(!datafile.is_open(), "open data");
+  std::string line;
+  while ( getline(datafile, line) ) {
+    if ( line.at(0) == '#' ) { continue; } // Comment character
+    std::pair<std::string, std::string> keyValue;
+    keyValue.first  = line.substr(0, line.find(" "));   // Key
+    keyValue.second = line.substr(line.rfind(" ") + 1); // Value
+    data.push_back(keyValue);
+  }
+  datafile.close();
+
+  // Test reading input from a file (will read to end of file, so temp file used and filled incrementally)
+  char path[] = "/tmp/read-kb";
+  int fd = open(path, O_RDWR | O_TMPFILE, S_IRUSR | S_IWUSR );
+  errorIf(fd == -1, "open temp");
 
   ReadKB kb;
 
@@ -144,16 +160,17 @@ int main() {
 
   // Read input from file
   kb.setInput(fd, ReadKB::InputMode::Char);
-  char buf[] = "abcdefghijklmnopqrstuvwxyz";
+  std::ostringstream os;
   ssize_t s;
-
-  for (int ii = 0; ii < 10; ii++) {
-    errorIf((s = write(fd, buf + ii, 1)) == -1, "write");
+  for (auto it = data.begin(); it != data.end(); it++) {
+    const char *buf = static_cast<const char*>(it->second.c_str());
+    int len = it->second.length();
+    errorIf((s = write(fd, buf, len)) == -1, "write");
+    errorIf(s != len && (errno = EIO), "write all data");
     errorIf(lseek(fd, -s, SEEK_CUR) == -1, "lseek");
-    key = kb.read_key();
-    std::ostringstream os;
-    os << key;
-    st |= testEq(os.str(), std::string(1, buf[ii]), "Read input from file");
+    os.str("");
+    os << kb.read_key();
+    st |= testEq(os.str(), it->first, "Read input from file");
   }
 
   // Display Test Statuses

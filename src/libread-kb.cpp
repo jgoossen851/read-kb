@@ -111,9 +111,9 @@ std::ostream& operator<<(std::ostream& os, const ReadKB::Key& kbMods) {
       case ReadKB::Key::Enter        : os << "Enter";  break;
       case ReadKB::Key::Esc          : os << "Esc";    break;
       // Error Codes
-      case ReadKB::Key::UNDEFINED_CSI    : os << "Undef CSI"; break;
-      case ReadKB::Key::UNDEFINED_SS3    : os << "Undef SS3"; break;
-      case ReadKB::Key::UNDEFINED_ESCAPE : os << "Undef Esc"; break;
+      case ReadKB::Key::UNDEFINED_CSI    : os << "Undef-CSI"; break;
+      case ReadKB::Key::UNDEFINED_SS3    : os << "Undef-SS3"; break;
+      case ReadKB::Key::UNDEFINED_ESCAPE : os << "Undef-Esc"; break;
       case ReadKB::Key::UNDEFINED        : os << "Undefined"; break;
       case ReadKB::Key::ERROR            : os << "Error";     break;
       default : os << "Error"; break;
