@@ -178,7 +178,7 @@ ReadKB::Key ReadKB::categorizeBuffer(const u_char *buf, const ssize_t len) const
 ReadKB::Key ReadKB::categorizeFunction(const u_char *buf, const ssize_t len) const {
   assert(len > 0 && "Nothing in buffer to process");
   Key key_pressed;
-  switch (buf[len-1]) {
+  switch (buf[len-1]) { // Last character
     case 'A' : key_pressed = Key::Up; break;
     case 'B' : key_pressed = Key::Down; break;
     case 'C' : key_pressed = Key::Right; break;
@@ -191,9 +191,30 @@ ReadKB::Key ReadKB::categorizeFunction(const u_char *buf, const ssize_t len) con
     case 'R' : key_pressed = Key::F3; break;
     case 'S' : key_pressed = Key::F4; break;
     case 'Z' : key_pressed = Mod::Shft & Key::Tab; break;
-    case '~' : 
-      assert(len > 1 && "Not enough in buffer to process");
-      key_pressed = Key::UNDEFINED_CSI;
+    case '~' :
+      switch (buf[0]) { // First character
+        case '1' :
+          switch(buf[1]) { // Second character
+            case '~' : key_pressed = Key::ERROR; break;
+            case '5' : key_pressed = Key::F5; break;
+            case '7' : key_pressed = Key::F6; break;
+            case '8' : key_pressed = Key::F7; break;
+            case '9' : key_pressed = Key::F8; break;
+            default : key_pressed = Key::ERROR;
+          } break;
+        case '2' :
+          switch(buf[1]) { // Second character
+            case '~' : key_pressed = Key::Insert; break;
+            case '0' : key_pressed = Key::F9; break;
+            case '3' : key_pressed = Key::F11; break;
+            case '4' : key_pressed = Key::F12; break;
+            default : key_pressed = Key::ERROR;
+          } break;
+        case '3' : key_pressed = Key::Delete; break;
+        case '5' : key_pressed = Key::PageUp; break;
+        case '6' : key_pressed = Key::PageDown; break;
+        default : key_pressed = Key::ERROR;
+      }
       break;
     default : key_pressed = Key::UNDEFINED_CSI;
   }
