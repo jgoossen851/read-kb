@@ -23,7 +23,7 @@ enum COMMANDS {
 
 
 // Initialization function for command map
-static std::map<std::string, COMMANDS> InitializeMap();
+static std::map<ReadKB::Key, COMMANDS> InitializeMap();
 
 int main() {
 
@@ -31,49 +31,41 @@ int main() {
   auto dictionary = InitializeMap();
   ReadKB kb;
 
-  ReadKB::Key key;
-  while(true) {
-    key = kb.read_key();
-    std::cout << "[" << key << "]" << std::flush;
+  bool keep_reading = true;
+  while(keep_reading) {
+    ReadKB::Key key_pressed = kb.read_key();
+    switch (dictionary[key_pressed]) {
+      case EXIT_CODE : // Exit Condition
+        keep_reading = false;
+        break;
+      case HELP : // Print Usage
+        std::cout << "Help" << std::endl;
+        break;
+      case UP :       std::cout << "\033[A" << std::flush;  break;
+      case DOWN :     std::cout << "\033[B" << std::flush;  break;
+      case FORWARD :  std::cout << "\033[C" << std::flush;  break;
+      case BACK :     std::cout << "\033[D" << std::flush;  break;
+      default :
+        std::cout << "(" << key_pressed << ")" << std::flush;
+    }
   }
-  
-  // Keep reading input as long as at least one file descriptor is open.
-  // bool keep_reading = true;
-  // while(keep_reading) {
-
-  //   std::string key_pressed = kb.getKey();
-  //   switch (dictionary[key_pressed]) {
-  //     case EXIT_CODE : // Exit Condition
-  //       keep_reading = false;
-  //       break;
-  //     case HELP : // Print Usage
-  //       std::cout << "Help" << std::endl;
-  //       break;
-  //     case UP :       std::cout << "\033[A" << std::flush;  break;
-  //     case DOWN :     std::cout << "\033[B" << std::flush;  break;
-  //     case FORWARD :  std::cout << "\033[C" << std::flush;  break;
-  //     case BACK :     std::cout << "\033[D" << std::flush;  break;
-  //     default :
-  //       std::cout << "(" << key_pressed << ")" << std::flush;
-  //   }
-  // }
 
   return 0;
 }
 
-std::map<std::string, COMMANDS> InitializeMap(){
+std::map<ReadKB::Key, COMMANDS> InitializeMap(){
   
-  std::map< std::string, COMMANDS > dictionary;
+  std::map< ReadKB::Key, COMMANDS > dictionary;
 
   // Define user commands
-  dictionary["SIGTERM"] = EXIT_CODE;
-  dictionary["x"]       = EXIT_CODE;
-  dictionary["X"]       = EXIT_CODE;
-  dictionary["h"]       = HELP;
-  dictionary["Up"]      = UP;
-  dictionary["Down"]    = DOWN;
-  dictionary["Right"]   = FORWARD;
-  dictionary["Left"]    = BACK;
+  dictionary[ReadKB::Key::Esc]              = EXIT_CODE;
+  dictionary[static_cast<ReadKB::Key>('x')] = EXIT_CODE;
+  dictionary[static_cast<ReadKB::Key>('X')] = EXIT_CODE;
+  dictionary[static_cast<ReadKB::Key>('h')] = HELP;
+  dictionary[ReadKB::Key::Up]               = UP;
+  dictionary[ReadKB::Key::Down]             = DOWN;
+  dictionary[ReadKB::Key::Right]            = FORWARD;
+  dictionary[ReadKB::Key::Left]             = BACK;
 
   return dictionary;
 }
