@@ -175,5 +175,5 @@ The values of the enum are given below:
 
 ```bash
 read-kb
-# Press any key to print it's name - either a letter or a special key like "Shft-Ctrl-Alt-F8"
+# Press any key to print it's name - either a letter or a special key like "Ctrl-Alt-Shft-F8"
 ```

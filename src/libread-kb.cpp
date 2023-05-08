@@ -162,7 +162,6 @@ void ReadKB::setInput(const int &fd, const InputMode &mode) {
   printlog("Reading input from fd %d\n", pfds->fd);
 }
 
-
 ReadKB::Key ReadKB::categorizeBuffer(const u_char *buf, const ssize_t len) const {
   assert(len > 0 && "Nothing in buffer to process");
   Key key_pressed;
@@ -181,7 +180,7 @@ ReadKB::Key ReadKB::categorizeBuffer(const u_char *buf, const ssize_t len) const
                           : categorizeFunction(&buf[2], len - 2);
             break;
           default : // Alt-key
-            key_pressed = categorizeBuffer(&buf[1], len - 1) & Mod::Alt;
+            key_pressed = Mod::Alt & categorizeBuffer(&buf[1], len - 1);
         }
         break;
       default : key_pressed = Key::UNDEFINED;
