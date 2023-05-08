@@ -174,6 +174,17 @@ ReadKB::Key ReadKB::categorizeBuffer(const u_char *buf, const ssize_t len) const
   return key_pressed;
 };
 
+/// Return the combination of Shft, Ctrl, and Alt corresponding to the terminal encoding of a numeric char
+ReadKB::Modifier ReadKB::categorizeMod(const u_char c) const {
+  assert(c >= '2' && c <= '8' && "Encoded char is out of range");
+  int i = c - 49; // ASCII '2', '3', '4', ... -> int 1, 2, 3, ...
+  Modifier mod(static_cast<BitmaskSet>(0), static_cast<BitmaskClear>(0));
+  if (i & (1<<0)) { mod &= Mod::Shft; }
+  if (i & (1<<1)) { mod &= Mod::Alt;  }
+  if (i & (1<<2)) { mod &= Mod::Ctrl; }
+  return mod;
+};
+
 std::ostream& operator<<(std::ostream& os, const ReadKB::Key& kbMods) {
   // Remove modifiers and add to output stream
   ReadKB::Key kb = kbMods;

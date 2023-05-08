@@ -62,9 +62,14 @@ class ReadKB {
 
   typedef std::pair<BitmaskSet, BitmaskClear> Modifier;
 
+  friend constexpr Modifier& operator&=(Modifier& m1, const Modifier& m2) {
+    m1.first  = static_cast<BitmaskSet>  (static_cast<uint>(m1.first)   | static_cast<uint>(m2.first));
+    m1.second = static_cast<BitmaskClear>(static_cast<uint>(m1.second)  | static_cast<uint>(m2.second));
+    return m1;
+  }
   friend constexpr Modifier operator&(const Modifier& m1, const Modifier& m2) {
-    return Modifier(static_cast<BitmaskSet>  (static_cast<uint>(m1.first)   | static_cast<uint>(m2.first)),
-                    static_cast<BitmaskClear>(static_cast<uint>(m1.second)  | static_cast<uint>(m2.second)));
+    Modifier mod(m1);
+    return mod  &= m2;
   }
 
   InputMode mode_ = InputMode::Char;
@@ -73,8 +78,9 @@ class ReadKB {
     FILE* g_pDebugLogFile;
   #endif
 
-  void resetTerminal(const int fd);
-  Key categorizeBuffer(const u_char *buf, const ssize_t len) const;
+  void      resetTerminal(const int fd);
+  Key       categorizeBuffer(const u_char *buf, const ssize_t len) const;
+  Modifier  categorizeMod(const u_char c) const;
 };
 
 
