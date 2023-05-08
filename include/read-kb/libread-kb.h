@@ -203,11 +203,16 @@ class ReadKB::Key {
   constexpr operator uint() const {return static_cast<uint>(mkey);}
 
   // Bitwise operators
-  friend constexpr Key operator&(const Modifier& mod, const Key& key) {
+  friend constexpr Key operator&(const Key& key, const Modifier& mod) {
     return Key((key | static_cast<uint>(mod.first)) & ~static_cast<uint>(mod.second));
   }
-  friend constexpr Key operator&(const Key& key, const Modifier& mod) {
-    return mod & key;
+  friend constexpr Key operator&(const Modifier& mod, const Key& key) {
+    return key & mod;
+  }
+  friend constexpr Key& operator&=(Key& key, const Modifier& mod) {
+    /// @todo Define &= in-place and define & operator in terms of &=
+    key = key & mod;
+    return key;
   }
 
   /// Stream insertion operator

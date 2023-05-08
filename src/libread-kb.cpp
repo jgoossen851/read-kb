@@ -105,6 +105,21 @@ ReadKB::Key ReadKB::read_key() const {
       }
     }
   }
+
+  // Rename keys as necessary due to OS capturing the default value
+  // Combo captured by OS but Ctrl-Combo not
+  if (key_pressed == (Mod::Alt & Key::Tab)) {
+    key_pressed &= Mod::Ctrl;
+  }
+  // Combo captured by OS but Shft-Combo not
+  if (key_pressed == (            Mod::Alt & static_cast<Key>(' ')) ||
+      key_pressed == (Mod::Ctrl & Mod::Alt & static_cast<Key>('f')) ||
+      key_pressed == (Mod::Ctrl & Mod::Alt & static_cast<Key>('l')) ||
+      key_pressed == (Mod::Ctrl & Mod::Alt & static_cast<Key>('t'))) {
+    std::cout << "updated" << std::endl;
+    key_pressed &= Mod::Shft;
+  }
+
   return key_pressed;
 }
 
@@ -314,13 +329,16 @@ std::ostream& operator<<(std::ostream& os, const ReadKB::Key& kbMods) {
       case ReadKB::Key::Tab          : os << "Tab";    break;
       case ReadKB::Key::Enter        : os << "Enter";  break;
       case ReadKB::Key::Esc          : os << "Esc";    break;
+      // Special Cases
+      case ReadKB::Mod::Shft & static_cast<ReadKB::Key>(' ') // Space not an "Event" key
+                                         : os << "Shft-Space"; break;
       // Error Codes
       case ReadKB::Key::UNDEFINED_CSI    : os << "Undef-CSI"; break;
       case ReadKB::Key::UNDEFINED_SS3    : os << "Undef-SS3"; break;
       case ReadKB::Key::UNDEFINED_ESCAPE : os << "Undef-Esc"; break;
       case ReadKB::Key::UNDEFINED        : os << "Undefined"; break;
       case ReadKB::Key::ERROR            : os << "Error";     break;
-      default : os << "Error"; break;
+      default : os << "Disp-Error"; break;
     }
   }
   return os;
