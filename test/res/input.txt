@@ -208,7 +208,7 @@ Alt-z                   z
 Alt-[                   [
 Alt-\                   \
 Alt-]                   ]
-Alt-Bksp                n
+Alt-Bksp                
         Alt-Ins
         Alt-Del
 Alt-PgUp                [5;3~
@@ -233,10 +233,10 @@ Alt-Center              [1;3E
 Alt-End                 [1;3F
 Alt-Home                [1;3H
         Alt-Tab
-Alt-Enter               n
+ Alt-Enter (parse error)
 Alt-Esc                 
  ====== Alt-Shift =======
-Alt-Shft-Space          n
+ Alt-Shft-Space (parse error)
 Alt-"                   "
 Alt-<                   <
 Alt-_                   _
@@ -483,36 +483,36 @@ Ctrl-Shft-Center        [1;6E
     Ctrl-Alt-;
     Ctrl-Alt-=
     Ctrl-Alt-`
-Ctrl-Alt-a              n
-Ctrl-Alt-b              n
+Ctrl-Alt-a              
+Ctrl-Alt-b              
         Ctrl-Alt-c
-Ctrl-Alt-d              n
-Ctrl-Alt-e              n
+Ctrl-Alt-d              
+Ctrl-Alt-e              
         Ctrl-Alt-f
-Ctrl-Alt-g              
+Ctrl-Alt-g              
         Ctrl-Alt-h
-Ctrl-Alt-i              n
+Ctrl-Alt-i              
     Ctrl-Alt-j
-Ctrl-Alt-k              n
+Ctrl-Alt-k              
         Ctrl-Alt-l
     Ctrl-Alt-m
-Ctrl-Alt-n              n
-Ctrl-Alt-o              n
-Ctrl-Alt-p              n
+Ctrl-Alt-n              
+Ctrl-Alt-o              
+Ctrl-Alt-p              
     Ctrl-Alt-q
-Ctrl-Alt-r              n
+Ctrl-Alt-r              
         Ctrl-Alt-s
         Ctrl-Alt-t
-Ctrl-Alt-u              n
-Ctrl-Alt-v              n
-Ctrl-Alt-w              n
-Ctrl-Alt-x              n
-Ctrl-Alt-y              n
+Ctrl-Alt-u              
+Ctrl-Alt-v              
+Ctrl-Alt-w              
+Ctrl-Alt-x              
+Ctrl-Alt-y              
         Ctrl-Alt-z
     Ctrl-Alt-[
         Ctrl-Alt-\
-Ctrl-Alt-]              n
-Ctrl-Alt-Bksp           n
+Ctrl-Alt-]              
+Ctrl-Alt-Bksp           
         Ctrl-Alt-Ins
         Ctrl-Alt-Del
 Ctrl-Alt-PgUp           [5;7~
@@ -536,23 +536,23 @@ Ctrl-Alt-PgDn           [6;7~
         Ctrl-Alt-Center
         Ctrl-Alt-End
         Ctrl-Alt-Home
-Ctrl-Alt-Tab            n
+Ctrl-Alt-Tab            	
     Ctrl-Alt-Enter
         Ctrl-Alt-Esc
  ====== Ctrl-Alt-Shift ==
     Ctrl-Alt-Shft-Space
     Ctrl-Alt-"
     Ctrl-Alt-<
-Ctrl-Alt-_              n
+Ctrl-Alt-_              
     Ctrl-Alt->
     Ctrl-Alt-?
     Ctrl-Alt-)
     Ctrl-Alt-!
-Ctrl-Alt-@              n
+Ctrl-Alt-@               
     Ctrl-Alt-#
     Ctrl-Alt-$
     Ctrl-Alt-%
-Ctrl-Alt-^              n
+Ctrl-Alt-^              
     Ctrl-Alt-&
     Ctrl-Alt-*
     Ctrl-Alt-(
@@ -564,13 +564,13 @@ Ctrl-Alt-^              n
         Ctrl-Alt-C
     Ctrl-Alt-D
     Ctrl-Alt-E
-Ctrl-Alt-F              n
+Ctrl-Alt-F              
     Ctrl-Alt-G
     Ctrl-Alt-H
     Ctrl-Alt-I
     Ctrl-Alt-J
     Ctrl-Alt-K
-Ctrl-Alt-L              n
+Ctrl-Alt-L              
     Ctrl-Alt-M
     Ctrl-Alt-N
     Ctrl-Alt-O
@@ -578,7 +578,7 @@ Ctrl-Alt-L              n
     Ctrl-Alt-Q
     Ctrl-Alt-R
         Ctrl-Alt-S
-Ctrl-Alt-T              n
+Ctrl-Alt-T              
     Ctrl-Alt-U
     Ctrl-Alt-V
     Ctrl-Alt-W
