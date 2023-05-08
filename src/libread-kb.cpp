@@ -174,7 +174,12 @@ ReadKB::Key ReadKB::read_key() const {
         errorIf(s + 1 > BUFF_SIZE_CHARS && (errno = ENOBUFS), "read");
         printlog("    read %zd bytes: \033[1m", s);
         for (int ii = 0; ii < s; ii++) {
-          printlog("%d  ", (uint)buf[ii]);
+          char c = buf[ii];
+          char delimL = (c <= ' ' ? '[' : ' ');
+          char delimR = (c <= ' ' ? ']' : ' ');
+          c = (c < ' ' ? c + 64 : c ); // C0 Control Codes
+          c = (c == 127 ? 128 : c );   // DEL character
+          printlog("%c%c%c", delimL, c, delimR);
         }
         printlog("\033[0m\n");
 
