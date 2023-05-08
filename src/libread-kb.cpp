@@ -57,7 +57,7 @@ ReadKB::~ReadKB() {
 
 ReadKB::Key ReadKB::read_key() const {
   int num_ready;
-  ReadKB::Key key_pressed;
+  Key key_pressed;
 
   printlog("Polling pipe for signal or data... ");
   num_ready = poll(pfds, 1, -1);
@@ -97,7 +97,7 @@ ReadKB::Key ReadKB::read_key() const {
         #endif
         printlog("\033[0m\n");
 
-        key_pressed = s > 0 ? categorizeBuffer(buf, s) : Key(ReadKB::Key::ERROR);
+        key_pressed = s > 0 ? categorizeBuffer(buf, s) : Key(Key::ERROR);
 
       } else {
         // Process other signals (POLLERR | POLLHUP | POLLNVAL)
@@ -150,27 +150,52 @@ void ReadKB::setInput(const int &fd, const InputMode &mode) {
 
 ReadKB::Key ReadKB::categorizeBuffer(const u_char *buf, const ssize_t len) const {
   assert(len > 0 && "Nothing in buffer to process");
-  ReadKB::Key key_pressed;
+  Key key_pressed;
   if (len == 1 && buf[0] <= 127) {
     // ASCII
-    key_pressed = static_cast<ReadKB::Key>(char(buf[0]));
+    key_pressed = static_cast<Key>(char(buf[0]));
   } else {
     switch (buf[0]) {
       case '\033' : // Esc
         assert(len > 1 && "No more chars in buffer to read");
         switch (buf[1]) {
           case '[' : // Control Sequence Introducer
-            key_pressed = Key::UNDEFINED_CSI;
-            break;
           case 'O' : // Single Shift Three
-            key_pressed = Key::UNDEFINED_SS3;
+            key_pressed = len == 2
+                          ? Mod::Alt & static_cast<Key>(char(buf[1]))
+                          : categorizeFunction(&buf[2], len - 2);
             break;
-          // Alt-key
-          default : key_pressed = categorizeBuffer(&buf[1], len - 1) & Mod::Alt;
+          default : // Alt-key
+            key_pressed = categorizeBuffer(&buf[1], len - 1) & Mod::Alt;
         }
         break;
       default : key_pressed = Key::UNDEFINED;
     }
+  }
+  return key_pressed;
+};
+
+ReadKB::Key ReadKB::categorizeFunction(const u_char *buf, const ssize_t len) const {
+  assert(len > 0 && "Nothing in buffer to process");
+  Key key_pressed;
+  switch (buf[len-1]) {
+    case 'A' : key_pressed = Key::Up; break;
+    case 'B' : key_pressed = Key::Down; break;
+    case 'C' : key_pressed = Key::Right; break;
+    case 'D' : key_pressed = Key::Left; break;
+    case 'E' : key_pressed = Key::Center; break;
+    case 'F' : key_pressed = Key::End; break;
+    case 'H' : key_pressed = Key::Home; break;
+    case 'P' : key_pressed = Key::F1; break;
+    case 'Q' : key_pressed = Key::F2; break;
+    case 'R' : key_pressed = Key::F3; break;
+    case 'S' : key_pressed = Key::F4; break;
+    case 'Z' : key_pressed = Mod::Shft & Key::Tab; break;
+    case '~' : 
+      assert(len > 1 && "Not enough in buffer to process");
+      key_pressed = Key::UNDEFINED_CSI;
+      break;
+    default : key_pressed = Key::UNDEFINED_CSI;
   }
 
   return key_pressed;

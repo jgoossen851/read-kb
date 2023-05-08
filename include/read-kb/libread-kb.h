@@ -80,6 +80,7 @@ class ReadKB {
 
   void      resetTerminal(const int fd);
   Key       categorizeBuffer(const u_char *buf, const ssize_t len) const;
+  Key       categorizeFunction(const u_char *buf, const ssize_t len) const;
   Modifier  categorizeMod(const u_char c) const;
 };
 
