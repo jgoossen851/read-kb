@@ -252,7 +252,7 @@ ReadKB::Key ReadKB::categorizeBuffer(const u_char *buf, const ssize_t len) const
             key_pressed = Key::UNDEFINED_SS3;
             break;
           // Alt-key
-          default : key_pressed = Key::UNDEFINED_ESCAPE;
+          default : key_pressed = categorizeBuffer(&buf[1], len - 1) & Mod::Alt;
         }
         break;
       default : key_pressed = Key::UNDEFINED;
