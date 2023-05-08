@@ -139,7 +139,7 @@ int main() {
   errorIf(!datafile.is_open(), "open data");
   std::string line;
   while ( getline(datafile, line) ) {
-    if ( line.at(0) == '#' ) { continue; } // Comment character
+    if ( line.length() == 0 || line.at(0) == ' ' ) { continue; } // Comment character
     std::pair<std::string, std::string> keyValue;
     keyValue.first  = line.substr(0, line.find(" "));   // Key
     keyValue.second = line.substr(line.rfind(" ") + 1); // Value
