@@ -491,7 +491,7 @@ Ctrl-Alt-e              
         Ctrl-Alt-f
 Ctrl-Alt-g              
         Ctrl-Alt-h
-Ctrl-Alt-i              
+    Ctrl-Alt-i          	
     Ctrl-Alt-j
 Ctrl-Alt-k              
         Ctrl-Alt-l
