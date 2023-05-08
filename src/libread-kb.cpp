@@ -183,7 +183,7 @@ ReadKB::Key ReadKB::read_key() const {
         }
         printlog("\033[0m\n");
 
-        key_pressed = s > 0 ? categorizeBuffer(buf, s) : ReadKB::Key::ERROR;
+        key_pressed = s > 0 ? categorizeBuffer(buf, s) : Key(ReadKB::Key::ERROR);
 
       } else {
         // Process other signals (POLLERR | POLLHUP | POLLNVAL)
