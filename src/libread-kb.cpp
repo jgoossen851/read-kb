@@ -34,94 +34,6 @@
 #define STDIN_FD 0 // Standard input file descriptor
 #define BUFF_SIZE_CHARS 8 // Unicode less than 5 bytes and longest ANSI sequence (that I know of) is of the form e[nn;n~
 
-std::ostream& operator<<(std::ostream& os, const ReadKB::Key& kbMods) {
-  // Remove modifiers and add to output stream
-  ReadKB::Key kb = kbMods;
-  if(kb != kb.unsetMask(ReadKB::Mod::Ctrl)) { os << "Ctrl-"; }
-  if(kb != kb.unsetMask(ReadKB::Mod::Alt))  { os << "Alt-"; }
-  if(kb == (kb & ReadKB::Mod::Event) &&
-     kb != kb.unsetMask(ReadKB::Mod::Shft)) { os << "Shft-"; }
-
-  // Decode base key
-  if ((kb >= static_cast<uint>('a') && kb <= static_cast<uint>('z')) ||
-      (kb >= static_cast<uint>('A') && kb <= static_cast<uint>('Z')) ||
-      (kb >= static_cast<uint>('0') && kb <= static_cast<uint>('9'))) {
-    // Alphanumeric
-    os << static_cast<char>(kb.mkey);
-  } else {
-    switch (kb) {
-      case ReadKB::Key::DoubleQuote  : os << "\"";     break;
-      case ReadKB::Key::LeftAngle    : os << "<";      break;
-      case ReadKB::Key::Underscore   : os << "_";      break;
-      case ReadKB::Key::RightAngle   : os << ">";      break;
-      case ReadKB::Key::Question     : os << "?";      break;
-      case ReadKB::Key::RightParen   : os << ")";      break;
-      case ReadKB::Key::Exclamation  : os << "!";      break;
-      case ReadKB::Key::At           : os << "@";      break;
-      case ReadKB::Key::Hash         : os << "#";      break;
-      case ReadKB::Key::Dollar       : os << "$";      break;
-      case ReadKB::Key::Percent      : os << "%";      break;
-      case ReadKB::Key::Circumflex   : os << "^";      break;
-      case ReadKB::Key::Ampersand    : os << "&";      break;
-      case ReadKB::Key::Asterisk     : os << "*";      break;
-      case ReadKB::Key::LeftParen    : os << "(";      break;
-      case ReadKB::Key::Colon        : os << ":";      break;
-      case ReadKB::Key::Plus         : os << "+";      break;
-      case ReadKB::Key::Space        : os << " ";      break;
-      case ReadKB::Key::Quote        : os << "'";      break;
-      case ReadKB::Key::Comma        : os << ",";      break;
-      case ReadKB::Key::Dash         : os << "-";      break;
-      case ReadKB::Key::Period       : os << ".";      break;
-      case ReadKB::Key::Slash        : os << "/";      break;
-      case ReadKB::Key::Semicolon    : os << ";";      break;
-      case ReadKB::Key::Equal        : os << "=";      break;
-      case ReadKB::Key::Tilde        : os << "~";      break;
-      case ReadKB::Key::LeftBrace    : os << "{";      break;
-      case ReadKB::Key::Pipe         : os << "|";      break;
-      case ReadKB::Key::RightBrace   : os << "}";      break;
-      case ReadKB::Key::Grave        : os << "`";      break;
-      case ReadKB::Key::LeftBracket  : os << "[";      break;
-      case ReadKB::Key::Backslash    : os << "\\";     break;
-      case ReadKB::Key::RightBracket : os << "]";      break;
-      case ReadKB::Key::Backspace    : os << "Bksp";   break;
-      case ReadKB::Key::Insert       : os << "Ins";    break;
-      case ReadKB::Key::Delete       : os << "Del";    break;
-      case ReadKB::Key::PageUp       : os << "PgUp";   break;
-      case ReadKB::Key::PageDown     : os << "PgDn";   break;
-      case ReadKB::Key::F1           : os << "F1";     break;
-      case ReadKB::Key::F2           : os << "F2";     break;
-      case ReadKB::Key::F3           : os << "F3";     break;
-      case ReadKB::Key::F4           : os << "F4";     break;
-      case ReadKB::Key::F5           : os << "F5";     break;
-      case ReadKB::Key::F6           : os << "F6";     break;
-      case ReadKB::Key::F7           : os << "F7";     break;
-      case ReadKB::Key::F8           : os << "F8";     break;
-      case ReadKB::Key::F9           : os << "F9";     break;
-      case ReadKB::Key::F10          : os << "F10";    break;
-      case ReadKB::Key::F11          : os << "F11";    break;
-      case ReadKB::Key::F12          : os << "F12";    break;
-      case ReadKB::Key::Up           : os << "Up";     break;
-      case ReadKB::Key::Down         : os << "Down";   break;
-      case ReadKB::Key::Right        : os << "Right";  break;
-      case ReadKB::Key::Left         : os << "Left";   break;
-      case ReadKB::Key::Center       : os << "Center"; break;
-      case ReadKB::Key::End          : os << "End";    break;
-      case ReadKB::Key::Home         : os << "Home";   break;
-      case ReadKB::Key::Tab          : os << "Tab";    break;
-      case ReadKB::Key::Enter        : os << "Enter";  break;
-      case ReadKB::Key::Esc          : os << "Esc";    break;
-      // Error Codes
-      case ReadKB::Key::UNDEFINED_CSI    : os << "Undef-CSI"; break;
-      case ReadKB::Key::UNDEFINED_SS3    : os << "Undef-SS3"; break;
-      case ReadKB::Key::UNDEFINED_ESCAPE : os << "Undef-Esc"; break;
-      case ReadKB::Key::UNDEFINED        : os << "Undefined"; break;
-      case ReadKB::Key::ERROR            : os << "Error";     break;
-      default : os << "Error"; break;
-    }
-  }
-  return os;
-}
-
 ReadKB::ReadKB() {
   // Initialize debugging log file
   #if DEBUG_LIB_READ_KB == 1
@@ -261,3 +173,91 @@ ReadKB::Key ReadKB::categorizeBuffer(const u_char *buf, const ssize_t len) const
 
   return key_pressed;
 };
+
+std::ostream& operator<<(std::ostream& os, const ReadKB::Key& kbMods) {
+  // Remove modifiers and add to output stream
+  ReadKB::Key kb = kbMods;
+  if(kb != kb.unsetMask(ReadKB::Mod::Ctrl)) { os << "Ctrl-"; }
+  if(kb != kb.unsetMask(ReadKB::Mod::Alt))  { os << "Alt-"; }
+  if(kb == (kb & ReadKB::Mod::Event) &&
+     kb != kb.unsetMask(ReadKB::Mod::Shft)) { os << "Shft-"; }
+
+  // Decode base key
+  if ((kb >= static_cast<uint>('a') && kb <= static_cast<uint>('z')) ||
+      (kb >= static_cast<uint>('A') && kb <= static_cast<uint>('Z')) ||
+      (kb >= static_cast<uint>('0') && kb <= static_cast<uint>('9'))) {
+    // Alphanumeric
+    os << static_cast<char>(kb.mkey);
+  } else {
+    switch (kb) {
+      case ReadKB::Key::DoubleQuote  : os << "\"";     break;
+      case ReadKB::Key::LeftAngle    : os << "<";      break;
+      case ReadKB::Key::Underscore   : os << "_";      break;
+      case ReadKB::Key::RightAngle   : os << ">";      break;
+      case ReadKB::Key::Question     : os << "?";      break;
+      case ReadKB::Key::RightParen   : os << ")";      break;
+      case ReadKB::Key::Exclamation  : os << "!";      break;
+      case ReadKB::Key::At           : os << "@";      break;
+      case ReadKB::Key::Hash         : os << "#";      break;
+      case ReadKB::Key::Dollar       : os << "$";      break;
+      case ReadKB::Key::Percent      : os << "%";      break;
+      case ReadKB::Key::Circumflex   : os << "^";      break;
+      case ReadKB::Key::Ampersand    : os << "&";      break;
+      case ReadKB::Key::Asterisk     : os << "*";      break;
+      case ReadKB::Key::LeftParen    : os << "(";      break;
+      case ReadKB::Key::Colon        : os << ":";      break;
+      case ReadKB::Key::Plus         : os << "+";      break;
+      case ReadKB::Key::Space        : os << " ";      break;
+      case ReadKB::Key::Quote        : os << "'";      break;
+      case ReadKB::Key::Comma        : os << ",";      break;
+      case ReadKB::Key::Dash         : os << "-";      break;
+      case ReadKB::Key::Period       : os << ".";      break;
+      case ReadKB::Key::Slash        : os << "/";      break;
+      case ReadKB::Key::Semicolon    : os << ";";      break;
+      case ReadKB::Key::Equal        : os << "=";      break;
+      case ReadKB::Key::Tilde        : os << "~";      break;
+      case ReadKB::Key::LeftBrace    : os << "{";      break;
+      case ReadKB::Key::Pipe         : os << "|";      break;
+      case ReadKB::Key::RightBrace   : os << "}";      break;
+      case ReadKB::Key::Grave        : os << "`";      break;
+      case ReadKB::Key::LeftBracket  : os << "[";      break;
+      case ReadKB::Key::Backslash    : os << "\\";     break;
+      case ReadKB::Key::RightBracket : os << "]";      break;
+      case ReadKB::Key::Backspace    : os << "Bksp";   break;
+      case ReadKB::Key::Insert       : os << "Ins";    break;
+      case ReadKB::Key::Delete       : os << "Del";    break;
+      case ReadKB::Key::PageUp       : os << "PgUp";   break;
+      case ReadKB::Key::PageDown     : os << "PgDn";   break;
+      case ReadKB::Key::F1           : os << "F1";     break;
+      case ReadKB::Key::F2           : os << "F2";     break;
+      case ReadKB::Key::F3           : os << "F3";     break;
+      case ReadKB::Key::F4           : os << "F4";     break;
+      case ReadKB::Key::F5           : os << "F5";     break;
+      case ReadKB::Key::F6           : os << "F6";     break;
+      case ReadKB::Key::F7           : os << "F7";     break;
+      case ReadKB::Key::F8           : os << "F8";     break;
+      case ReadKB::Key::F9           : os << "F9";     break;
+      case ReadKB::Key::F10          : os << "F10";    break;
+      case ReadKB::Key::F11          : os << "F11";    break;
+      case ReadKB::Key::F12          : os << "F12";    break;
+      case ReadKB::Key::Up           : os << "Up";     break;
+      case ReadKB::Key::Down         : os << "Down";   break;
+      case ReadKB::Key::Right        : os << "Right";  break;
+      case ReadKB::Key::Left         : os << "Left";   break;
+      case ReadKB::Key::Center       : os << "Center"; break;
+      case ReadKB::Key::End          : os << "End";    break;
+      case ReadKB::Key::Home         : os << "Home";   break;
+      case ReadKB::Key::Tab          : os << "Tab";    break;
+      case ReadKB::Key::Enter        : os << "Enter";  break;
+      case ReadKB::Key::Esc          : os << "Esc";    break;
+      // Error Codes
+      case ReadKB::Key::UNDEFINED_CSI    : os << "Undef-CSI"; break;
+      case ReadKB::Key::UNDEFINED_SS3    : os << "Undef-SS3"; break;
+      case ReadKB::Key::UNDEFINED_ESCAPE : os << "Undef-Esc"; break;
+      case ReadKB::Key::UNDEFINED        : os << "Undefined"; break;
+      case ReadKB::Key::ERROR            : os << "Error";     break;
+      default : os << "Error"; break;
+    }
+  }
+  return os;
+}
