@@ -126,8 +126,8 @@ int main() {
     case ReadKB::Key::Comma: break;
     case ReadKB::Key::Period: break;
     case ReadKB::Key::Exclamation & ReadKB::Mod::Shft: break;
-    // case ReadKB::Mod::Shft & ReadKB::Key::Equal: break; /// @todo Allow key to be placed last
-    // case ReadKB::Mod::Alt & ReadKB::Mod::Ctrl & ReadKB::Key::Up: break; /// @todo Allow key to be placed last with multiple mods
+    case ReadKB::Mod::Shft & ReadKB::Key::Equal: break; /// Modifier on left
+    case (ReadKB::Mod::Alt & ReadKB::Mod::Ctrl) & ReadKB::Key::Up: break; /// Combine modifiers
     case ReadKB::Key::Question & ReadKB::Mod::Ctrl & ReadKB::Mod::Alt : break;
     default: break;
   }

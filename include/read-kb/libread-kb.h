@@ -62,6 +62,11 @@ class ReadKB {
 
   typedef std::pair<BitmaskSet, BitmaskClear> Modifier;
 
+  friend constexpr Modifier operator&(const Modifier& m1, const Modifier& m2) {
+    return Modifier(static_cast<BitmaskSet>  (static_cast<uint>(m1.first)   | static_cast<uint>(m2.first)),
+                    static_cast<BitmaskClear>(static_cast<uint>(m1.second)  | static_cast<uint>(m2.second)));
+  }
+
   InputMode mode_ = InputMode::Char;
   struct pollfd *pfds;
   #if DEBUG_LIB_READ_KB == 1
@@ -191,8 +196,11 @@ class ReadKB::Key {
   constexpr operator uint() const {return static_cast<uint>(mkey);}
 
   // Bitwise operators
-  friend constexpr Key operator&(const Key& key, const Modifier mod) {
+  friend constexpr Key operator&(const Modifier& mod, const Key& key) {
     return Key((key | static_cast<uint>(mod.first)) & ~static_cast<uint>(mod.second));
+  }
+  friend constexpr Key operator&(const Key& key, const Modifier& mod) {
+    return mod & key;
   }
 
   /// Stream insertion operator
