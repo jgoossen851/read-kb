@@ -13,6 +13,7 @@
 #include <cstdio>
 #include <ostream>
 #include <string>
+#include <utility>
 
 // use `tail -f "/tmp/read-kb-debug-log.txt"` from a terminal to see debug messages
 #define DEBUG_LIB_READ_KB 0
@@ -59,21 +60,36 @@ class ReadKB {
     UNDEFINED
   };
 
+  typedef std::pair<BitmaskSet, BitmaskClear> Modifier;
+
+  friend constexpr Modifier& operator&=(Modifier& m1, const Modifier& m2) {
+    m1.first  = static_cast<BitmaskSet>  (static_cast<uint>(m1.first)   | static_cast<uint>(m2.first));
+    m1.second = static_cast<BitmaskClear>(static_cast<uint>(m1.second)  | static_cast<uint>(m2.second));
+    return m1;
+  }
+  friend constexpr Modifier operator&(const Modifier& m1, const Modifier& m2) {
+    Modifier mod(m1);
+    return mod  &= m2;
+  }
+
   InputMode mode_ = InputMode::Char;
   struct pollfd *pfds;
   #if DEBUG_LIB_READ_KB == 1
     FILE* g_pDebugLogFile;
   #endif
 
-  void resetTerminal(const int fd);
-  Key categorizeBuffer(const u_char *buf, const ssize_t len) const;
+  void      resetTerminal(const int fd);
+  Key       categorizeBuffer(const u_char *buf, const ssize_t len) const;
+  Key       categorizeFunction(const u_char *buf, const ssize_t len) const;
+  Modifier  categorizeMod(const u_char c) const;
 };
 
+
 struct ReadKB::Mod {
-  static const BitmaskClear Shft  = BitmaskClear::Shift;
-  static const BitmaskSet   Ctrl  = BitmaskSet::Control;
-  static const BitmaskSet   Alt   = BitmaskSet::Alternate;
-  static const BitmaskSet   Event = BitmaskSet::Event;
+  static constexpr Modifier Shft  {static_cast<BitmaskSet>(0),  BitmaskClear::Shift};
+  static constexpr Modifier Ctrl  {BitmaskSet::Control,         static_cast<BitmaskClear>(0)};
+  static constexpr Modifier Alt   {BitmaskSet::Alternate,       static_cast<BitmaskClear>(0)};
+  static constexpr Modifier Event {BitmaskSet::Event,           static_cast<BitmaskClear>(0)};
 };
 
 class ReadKB::Key {
@@ -151,10 +167,10 @@ class ReadKB::Key {
     // Individually Set
     } else {
       switch (ascii) {
-        case 0  : return static_cast<KeyValue>(KeyValue::At + static_cast<KeyValue>(Mod::Ctrl)); break;
-        case 8  : return static_cast<KeyValue>(KeyValue::Backspace + static_cast<KeyValue>(Mod::Ctrl)); break;
-        case 30 : return static_cast<KeyValue>(KeyValue::Circumflex + static_cast<KeyValue>(Mod::Ctrl)); break;
-        case 31 : return static_cast<KeyValue>(KeyValue::Underscore + static_cast<KeyValue>(Mod::Ctrl)); break;
+        case 0  : return (KeyValue::At & Mod::Ctrl).mkey; break;
+        case 8  : return (KeyValue::Backspace & Mod::Ctrl).mkey; break;
+        case 30 : return (KeyValue::Circumflex & Mod::Ctrl).mkey; break;
+        case 31 : return (KeyValue::Underscore & Mod::Ctrl).mkey; break;
         case '"': return KeyValue::DoubleQuote; break;
         case '&': return KeyValue::Ampersand; break;
         case '(': return KeyValue::LeftParen; break;
@@ -187,11 +203,16 @@ class ReadKB::Key {
   constexpr operator uint() const {return static_cast<uint>(mkey);}
 
   // Bitwise operators
-  friend constexpr Key operator&(const Key& key, const BitmaskSet mSet) {
-    return Key(key | static_cast<uint>(mSet));
+  friend constexpr Key operator&(const Key& key, const Modifier& mod) {
+    return Key((key | static_cast<uint>(mod.first)) & ~static_cast<uint>(mod.second));
   }
-  friend constexpr Key operator&(const Key& key, const BitmaskClear mClr) {
-    return Key(key & ~static_cast<uint>(mClr));
+  friend constexpr Key operator&(const Modifier& mod, const Key& key) {
+    return key & mod;
+  }
+  friend constexpr Key& operator&=(Key& key, const Modifier& mod) {
+    /// @todo Define &= in-place and define & operator in terms of &=
+    key = key & mod;
+    return key;
   }
 
   /// Stream insertion operator
@@ -200,14 +221,8 @@ class ReadKB::Key {
  private:
   KeyValue mkey;
 
-  constexpr Key& unsetMask(const BitmaskSet mSet) {
-    /// @todo Clear mask in place
-    mkey = static_cast<KeyValue>(mkey & ~static_cast<uint>(mSet));
-    return *this;
-  }
-  constexpr Key& unsetMask(const BitmaskClear mClr) {
-    /// @todo Clear mask in place
-    mkey = static_cast<KeyValue>(mkey | static_cast<uint>(mClr));
+  constexpr Key& unsetMask(const Modifier mod) {
+    mkey = static_cast<KeyValue>((mkey & ~static_cast<uint>(mod.first)) | static_cast<uint>(mod.second));
     return *this;
   }
 };
