@@ -219,7 +219,12 @@ ReadKB::Key ReadKB::categorizeFunction(const u_char *buf, const ssize_t len) con
     default : key_pressed = Key::UNDEFINED_CSI;
   }
 
-  return key_pressed;
+  Modifier mod;
+  if (len >= 4) {
+    mod = categorizeMod(buf[len-2]); // Categorize penultimate character
+  }
+
+  return mod & key_pressed;
 };
 
 /// Return the combination of Shft, Ctrl, and Alt corresponding to the terminal encoding of a numeric char
