@@ -12,6 +12,7 @@
 #include <unistd.h>
 
 #include <cassert>
+#include <cerrno>
 #include <cstdio>
 #include <fstream>
 #include <iostream>
@@ -33,54 +34,89 @@
 #define STDIN_FD 0 // Standard input file descriptor
 #define BUFF_SIZE_CHARS 8 // Unicode less than 5 bytes and longest ANSI sequence (that I know of) is of the form e[nn;n~
 
+std::ostream& operator<<(std::ostream& os, const ReadKB::Key& kbMods) {
+  // Remove modifiers and add to output stream
+  ReadKB::Key kb = kbMods;
+  if(kb != kb.unsetMask(ReadKB::Mod::Ctrl)) { os << "Ctrl-"; }
+  if(kb != kb.unsetMask(ReadKB::Mod::Alt))  { os << "Alt-"; }
+  if(kb == (kb & ReadKB::Mod::Event) &&
+     kb != kb.unsetMask(ReadKB::Mod::Shft)) { os << "Shft-"; }
 
-std::ostream& operator<<(std::ostream& os, const ReadKB::Key kb) {
-  if (kb >= ReadKB::Key::SPACE && kb < ReadKB::Key::DEL) {
-    // Printable
-    os << static_cast<char>(kb);
+  // Decode base key
+  if ((kb >= static_cast<uint>('a') && kb <= static_cast<uint>('z')) ||
+      (kb >= static_cast<uint>('A') && kb <= static_cast<uint>('Z')) ||
+      (kb >= static_cast<uint>('0') && kb <= static_cast<uint>('9'))) {
+    // Alphanumeric
+    os << static_cast<char>(kb.mkey);
   } else {
-    // Unprintable
     switch (kb) {
-      case ReadKB::Key::NUL : os << "NUL";        break;
-      case ReadKB::Key::SOH : os << "Ctrl-A";     break;
-      case ReadKB::Key::STX : os << "Ctrl-B";     break;
-      case ReadKB::Key::ETX : os << "ETX";        break;
-      case ReadKB::Key::EOT : os << "Ctrl-D";     break;
-      case ReadKB::Key::ENQ : os << "Ctrl-E";     break;
-      case ReadKB::Key::ACK : os << "Ctrl-F";     break;
-      case ReadKB::Key::BEL : os << "Ctrl-G";     break;
-      case ReadKB::Key::BS  : os << "Ctrl-Bksp";  break;
-      case ReadKB::Key::HT  : os << "Tab";        break;
-      case ReadKB::Key::LF  : os << "Enter";      break;
-      case ReadKB::Key::VT  : os << "Ctrl-K";     break;
-      case ReadKB::Key::FF  : os << "Ctrl-L";     break;
-      case ReadKB::Key::CR  : os << "CR";         break;
-      case ReadKB::Key::SO  : os << "Ctrl-N";     break;
-      case ReadKB::Key::SI  : os << "Ctrl-O";     break;
-      case ReadKB::Key::DLE : os << "Ctrl-P";     break;
-      case ReadKB::Key::DC1 : os << "DC1";        break;
-      case ReadKB::Key::DC2 : os << "Ctrl-R";     break;
-      case ReadKB::Key::DC3 : os << "DC3";        break;
-      case ReadKB::Key::DC4 : os << "Ctrl-T";     break;
-      case ReadKB::Key::NAK : os << "Ctrl-U";     break;
-      case ReadKB::Key::SYN : os << "Ctrl-V";     break;
-      case ReadKB::Key::ETB : os << "Ctrl-W";     break;
-      case ReadKB::Key::CAN : os << "Ctrl-X";     break;
-      case ReadKB::Key::EM  : os << "Ctrl-Y";     break;
-      case ReadKB::Key::SUB : os << "SUB";        break;
-      case ReadKB::Key::ESC : os << "Esc";        break;
-      case ReadKB::Key::FS  : os << "FS";         break;
-      case ReadKB::Key::GS  : os << "GS";         break;
-      case ReadKB::Key::RS  : os << "RS";         break;
-      case ReadKB::Key::US  : os << "US";         break;
-      case ReadKB::Key::DEL : os << "Bksp";       break;
-      // Beyond ASCII
-      case ReadKB::Key::SPACE :
-      case ReadKB::Key::UNDEFINED_CSI : os << "Undef CSI"; break;
-      case ReadKB::Key::UNDEFINED_SS3 : os << "Undef SS3"; break;
-      case ReadKB::Key::UNDEFINED_ESCAPE : os << "Undef Esc"; break;
-      case ReadKB::Key::UNDEFINED : os << "Undefined"; break;
-      case ReadKB::Key::ERROR : os << "Error"; break;
+      case ReadKB::Key::DoubleQuote  : os << "\"";     break;
+      case ReadKB::Key::LeftAngle    : os << "<";      break;
+      case ReadKB::Key::Underscore   : os << "_";      break;
+      case ReadKB::Key::RightAngle   : os << ">";      break;
+      case ReadKB::Key::Question     : os << "?";      break;
+      case ReadKB::Key::RightParen   : os << ")";      break;
+      case ReadKB::Key::Exclamation  : os << "!";      break;
+      case ReadKB::Key::At           : os << "@";      break;
+      case ReadKB::Key::Hash         : os << "#";      break;
+      case ReadKB::Key::Dollar       : os << "$";      break;
+      case ReadKB::Key::Percent      : os << "%";      break;
+      case ReadKB::Key::Circumflex   : os << "^";      break;
+      case ReadKB::Key::Ampersand    : os << "&";      break;
+      case ReadKB::Key::Asterisk     : os << "*";      break;
+      case ReadKB::Key::LeftParen    : os << "(";      break;
+      case ReadKB::Key::Colon        : os << ":";      break;
+      case ReadKB::Key::Plus         : os << "+";      break;
+      case ReadKB::Key::Space        : os << " ";      break;
+      case ReadKB::Key::Quote        : os << "'";      break;
+      case ReadKB::Key::Comma        : os << ",";      break;
+      case ReadKB::Key::Dash         : os << "-";      break;
+      case ReadKB::Key::Period       : os << ".";      break;
+      case ReadKB::Key::Slash        : os << "/";      break;
+      case ReadKB::Key::Semicolon    : os << ";";      break;
+      case ReadKB::Key::Equal        : os << "=";      break;
+      case ReadKB::Key::Tilde        : os << "~";      break;
+      case ReadKB::Key::LeftBrace    : os << "{";      break;
+      case ReadKB::Key::Pipe         : os << "|";      break;
+      case ReadKB::Key::RightBrace   : os << "}";      break;
+      case ReadKB::Key::Grave        : os << "`";      break;
+      case ReadKB::Key::LeftBracket  : os << "[";      break;
+      case ReadKB::Key::Backslash    : os << "\\";     break;
+      case ReadKB::Key::RightBracket : os << "]";      break;
+      case ReadKB::Key::Backspace    : os << "Bksp";   break;
+      case ReadKB::Key::Insert       : os << "Ins";    break;
+      case ReadKB::Key::Delete       : os << "Del";    break;
+      case ReadKB::Key::PageUp       : os << "PgUp";   break;
+      case ReadKB::Key::PageDown     : os << "PgDn";   break;
+      case ReadKB::Key::F1           : os << "F1";     break;
+      case ReadKB::Key::F2           : os << "F2";     break;
+      case ReadKB::Key::F3           : os << "F3";     break;
+      case ReadKB::Key::F4           : os << "F4";     break;
+      case ReadKB::Key::F5           : os << "F5";     break;
+      case ReadKB::Key::F6           : os << "F6";     break;
+      case ReadKB::Key::F7           : os << "F7";     break;
+      case ReadKB::Key::F8           : os << "F8";     break;
+      case ReadKB::Key::F9           : os << "F9";     break;
+      case ReadKB::Key::F10          : os << "F10";    break;
+      case ReadKB::Key::F11          : os << "F11";    break;
+      case ReadKB::Key::F12          : os << "F12";    break;
+      case ReadKB::Key::Up           : os << "Up";     break;
+      case ReadKB::Key::Down         : os << "Down";   break;
+      case ReadKB::Key::Right        : os << "Right";  break;
+      case ReadKB::Key::Left         : os << "Left";   break;
+      case ReadKB::Key::Center       : os << "Center"; break;
+      case ReadKB::Key::End          : os << "End";    break;
+      case ReadKB::Key::Home         : os << "Home";   break;
+      case ReadKB::Key::Tab          : os << "Tab";    break;
+      case ReadKB::Key::Enter        : os << "Enter";  break;
+      case ReadKB::Key::Esc          : os << "Esc";    break;
+      // Error Codes
+      case ReadKB::Key::UNDEFINED_CSI    : os << "Undef-CSI"; break;
+      case ReadKB::Key::UNDEFINED_SS3    : os << "Undef-SS3"; break;
+      case ReadKB::Key::UNDEFINED_ESCAPE : os << "Undef-Esc"; break;
+      case ReadKB::Key::UNDEFINED        : os << "Undefined"; break;
+      case ReadKB::Key::ERROR            : os << "Error";     break;
+      default : os << "Error"; break;
     }
   }
   return os;
@@ -92,29 +128,24 @@ ReadKB::ReadKB() {
     g_pDebugLogFile = fopen ("/tmp/read-kb-debug-log.txt", "w");
   #endif
 
-  // Turn off OS buffering on standard input (non-canonical mode)
-  struct termios term;
-  tcgetattr(STDIN_FD, &term);
-  term.c_lflag &= ~ICANON; // Non-canonical mode
-  term.c_lflag &= ~ECHO; // Do not print input
-  tcsetattr(STDIN_FD, TCSANOW, &term);
-
-  // Get file descriptors for the poll command
+  // Allocate memory for file descriptor for the poll command
   pfds = static_cast<pollfd*>(calloc(1, sizeof(struct pollfd)));
   errorIf(pfds == NULL, "malloc");
 
-  // Open each file, and add it to 'pfds' array
-  pfds[0].fd = STDIN_FD;
-  errorIf(pfds[0].fd == -1, "open");
-  printlog("Opened \"%s\" on fd %d\n", "stdin", pfds[0].fd);
+  // Get single characters and assign file descriptor to poll structure
+  setInput(STDIN_FD, InputMode::Char);
 
   // Request poll() to scan file descriptor for data available to read (POLLIN signal)
-  pfds[0].events = POLLIN;
+  pfds->events = POLLIN;
+}
+
+ReadKB::~ReadKB() {
+  resetTerminal(STDIN_FD);
 }
 
 ReadKB::Key ReadKB::read_key() const {
   int num_ready;
-  Key key_pressed;
+  ReadKB::Key key_pressed;
 
   printlog("Polling pipe for signal or data... ");
   num_ready = poll(pfds, 1, -1);
@@ -126,28 +157,28 @@ ReadKB::Key ReadKB::read_key() const {
     // Read from pipe one buffer-length at a time
     u_char buf[BUFF_SIZE_CHARS];
 
-    if (pfds[0].revents != 0) {
+    if (pfds->revents != 0) {
 
       // Log signals (events) found by poll
-      printlog("  fd=%d; events: %s%s%s%s\n", pfds[0].fd,
-          (pfds[0].revents & POLLIN)   ? "\033[32mPOLLIN\033[0m "   : "",
-          (pfds[0].revents & POLLHUP)  ? "\033[33mPOLLHUP\033[0m "  : "",
-          (pfds[0].revents & POLLERR)  ? "\033[31mPOLLERR\033[0m "  : "",
-          (pfds[0].revents & POLLNVAL) ? "\033[31mPOLLNVAL\033[0m " : "");
+      printlog("  fd=%d; events: %s%s%s%s\n", pfds->fd,
+          (pfds->revents & POLLIN)   ? "\033[32mPOLLIN\033[0m "   : "",
+          (pfds->revents & POLLHUP)  ? "\033[33mPOLLHUP\033[0m "  : "",
+          (pfds->revents & POLLERR)  ? "\033[31mPOLLERR\033[0m "  : "",
+          (pfds->revents & POLLNVAL) ? "\033[31mPOLLNVAL\033[0m " : "");
 
-      if (pfds[0].revents & POLLIN) {
+      if (pfds->revents & POLLIN) {
         // Read from the pipe if there is data available (POLLIN)
 
-        ssize_t s = read(pfds[0].fd, buf, sizeof(buf));
+        ssize_t s = read(pfds->fd, buf, sizeof(buf));
         errorIf(s == -1, "read");
-        errorIf(s + 1 > BUFF_SIZE_CHARS, "read buffer overflow");
+        errorIf(s + 1 > BUFF_SIZE_CHARS && (errno = ENOBUFS), "read");
         printlog("    read %zd bytes: \033[1m", s);
         for (int ii = 0; ii < s; ii++) {
           printlog("%d  ", (uint)buf[ii]);
         }
         printlog("\033[0m\n");
 
-        key_pressed = categorizeBuffer(buf, s);
+        key_pressed = s > 0 ? categorizeBuffer(buf, s) : ReadKB::Key::ERROR;
 
       } else {
         // Process other signals (POLLERR | POLLHUP | POLLNVAL)
@@ -158,13 +189,52 @@ ReadKB::Key ReadKB::read_key() const {
   return key_pressed;
 }
 
+void ReadKB::resetTerminal(const int fd) {
+  struct termios term;
+  if(tcgetattr(fd, &term) == 0) {
+    term.c_lflag |= ICANON; // Canonical mode
+    term.c_lflag |= ECHO;   // Print input
+    errorIf(tcsetattr(fd, TCSANOW, &term) == -1, "termios reset");
+  }
+}
+
+void ReadKB::setInput(const int &fd, const InputMode &mode) {
+  // Reset original file descriptor
+  resetTerminal(pfds->fd);
+
+  // Set new mode
+  switch (mode) {
+    case InputMode::Char :
+      // Turn off OS buffering on standard input (non-canonical mode)
+      struct termios term;
+      if(tcgetattr(fd, &term) == 0) {
+        term.c_lflag &= ~ICANON; // Non-canonical mode
+        term.c_lflag &= ~ECHO;   // Do not print input
+        errorIf(tcsetattr(fd, TCSANOW, &term) == -1, "termios");
+      }
+      break;
+    case InputMode::Line :
+      resetTerminal(fd);
+      break;
+    case InputMode::File :
+      resetTerminal(fd);
+      break;
+  }
+  mode_ = mode;
+
+  // Assign file descriptor to poll structure
+  pfds->fd = fd;
+  errorIf(pfds->fd == -1, "open");
+  printlog("Reading input from fd %d\n", pfds->fd);
+}
+
 
 ReadKB::Key ReadKB::categorizeBuffer(const u_char *buf, const ssize_t len) const {
   assert(len > 0 && "Nothing in buffer to process");
-  Key key_pressed;
+  ReadKB::Key key_pressed;
   if (len == 1 && buf[0] <= 127) {
     // ASCII
-    key_pressed = static_cast<Key>(buf[0]);
+    key_pressed = static_cast<ReadKB::Key>(char(buf[0]));
   } else {
     switch (buf[0]) {
       case '\033' : // Esc
