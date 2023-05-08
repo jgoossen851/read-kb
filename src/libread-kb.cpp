@@ -85,6 +85,7 @@ ReadKB::Key ReadKB::read_key() const {
         errorIf(s == -1, "read");
         errorIf(s + 1 > BUFF_SIZE_CHARS && (errno = ENOBUFS), "read");
         printlog("    read %zd bytes: \033[1m", s);
+        #if DEBUG_LIB_READ_KB
         for (int ii = 0; ii < s; ii++) {
           char c = buf[ii];
           char delimL = (c <= ' ' ? '[' : ' ');
@@ -93,6 +94,7 @@ ReadKB::Key ReadKB::read_key() const {
           c = (c == 127 ? 128 : c );   // DEL character
           printlog("%c%c%c", delimL, c, delimR);
         }
+        #endif
         printlog("\033[0m\n");
 
         key_pressed = s > 0 ? categorizeBuffer(buf, s) : Key(ReadKB::Key::ERROR);
