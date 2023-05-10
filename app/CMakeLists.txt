@@ -6,16 +6,26 @@
 
 cmake_minimum_required(VERSION 3.9)
 
-add_executable(read-kb-cpp
+set(TARGET_NAME "read-kb-app")
+
+add_executable("${TARGET_NAME}"
   main.cpp
 )
 
-target_include_directories(read-kb-cpp
-  PRIVATE $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../include/read-kb>
+target_include_directories("${TARGET_NAME}"
+  PRIVATE $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../lib/read-kb/include/read-kb>
           $<INSTALL_INTERFACE:include/read-kb>  # <prefix>/include/read-kb
 )
 
 # Specify libraries or flags to use when linking a given target and/or its dependents
-target_link_libraries(read-kb-cpp
-  PRIVATE libread-kb
+target_link_libraries("${TARGET_NAME}"
+  PRIVATE read-kb
+)
+
+set_target_properties("${TARGET_NAME}"
+  PROPERTIES
+    OUTPUT_NAME "${PROJECT_NAME}"
+)
+install(TARGETS "${TARGET_NAME}"
+  DESTINATION bin
 )

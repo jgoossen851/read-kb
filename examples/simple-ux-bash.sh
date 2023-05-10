@@ -2,13 +2,12 @@
 
 # Read keynames on standard input and process events
 
-# Read from input pipe
-while read KEY_NAME; do
-
+while true; do
+  # Read from keyboard
+  KEY_NAME="$(read-kb)"
   case "${KEY_NAME}" in
-    # Define an exit command to receive through the pipe
-    'SIGTERM')  exit ;;
     # Process output of read-kb program
+    'Esc')      exit ;;
     'x' | 'X')  exit ;;
     'h')        echo "Help" ;;
     'Up')       echo -en "\e[A" ;;

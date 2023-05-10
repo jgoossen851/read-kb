@@ -5,8 +5,8 @@
  * Copyright (c) 2023, Jeremy Goossen jeremyg995@gmail.com
  */
 
-#ifndef LIBREAD_KB_H
-#define LIBREAD_KB_H
+#ifndef READ_KB_H
+#define READ_KB_H
 
 #include <poll.h>
 
@@ -228,4 +228,4 @@ class ReadKB::Key {
 };
 
 
-#endif // LIBREAD_KB_H
+#endif // READ_KB_H
