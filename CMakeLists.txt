@@ -42,4 +42,6 @@ add_subdirectory(app)
 add_subdirectory(lib/read-kb)
 
 # Examples
-add_subdirectory(examples)
+if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
+  add_subdirectory(examples)
+endif()
