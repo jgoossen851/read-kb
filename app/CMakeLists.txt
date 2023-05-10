@@ -6,23 +6,26 @@
 
 cmake_minimum_required(VERSION 3.9)
 
-set(TARGET_NAME "simple-ux-cpp")
+set(TARGET_NAME "read-kb-app")
 
 add_executable("${TARGET_NAME}"
   main.cpp
 )
 
-# Specify include directories to use when compiling the given target
 target_include_directories("${TARGET_NAME}"
-  PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/../lib/read-kb/include/read-kb"
+  PRIVATE $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../lib/read-kb/include/read-kb>
+          $<INSTALL_INTERFACE:include/read-kb>  # <prefix>/include/read-kb
 )
 
 # Specify libraries or flags to use when linking a given target and/or its dependents
 target_link_libraries("${TARGET_NAME}"
-  PUBLIC read-kb
+  PRIVATE read-kb
 )
 
-file(COPY_FILE
-  ${CMAKE_CURRENT_SOURCE_DIR}/simple-ux-bash.sh
-  ${CMAKE_CURRENT_BINARY_DIR}/simple-ux-bash
+set_target_properties("${TARGET_NAME}"
+  PROPERTIES
+    OUTPUT_NAME "${PROJECT_NAME}"
+)
+install(TARGETS "${TARGET_NAME}"
+  DESTINATION bin
 )

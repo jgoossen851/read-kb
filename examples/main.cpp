@@ -5,16 +5,12 @@
  * Copyright (c) 2023, Jeremy Goossen jeremyg995@gmail.com
  */
 
-/* This program reads keynames on standard input and processes events
- * based on the name received.
- */
+// Read keynames on standard input and process events
 
-#include <string>
-#include <map>
+#include "read-kb.h"
+
 #include <iostream>
-
-#include "libread-kb.h"
-
+#include <map>
 
 enum COMMANDS {
   NOT_DEFINED,
@@ -28,7 +24,7 @@ enum COMMANDS {
 
 
 // Initialization function for command map
-static std::map<std::string, COMMANDS> InitializeMap();
+static std::map<ReadKB::Key, COMMANDS> InitializeMap();
 
 int main() {
 
@@ -36,11 +32,9 @@ int main() {
   auto dictionary = InitializeMap();
   ReadKB kb;
 
-  // Keep calling poll() as long as at least one file descriptor is open.
   bool keep_reading = true;
   while(keep_reading) {
-
-    std::string key_pressed = kb.getKey();
+    ReadKB::Key key_pressed = kb.read_key();
     switch (dictionary[key_pressed]) {
       case EXIT_CODE : // Exit Condition
         keep_reading = false;
@@ -60,19 +54,19 @@ int main() {
   return 0;
 }
 
-std::map<std::string, COMMANDS> InitializeMap(){
+std::map<ReadKB::Key, COMMANDS> InitializeMap(){
   
-  std::map< std::string, COMMANDS > dictionary;
+  std::map< ReadKB::Key, COMMANDS > dictionary;
 
   // Define user commands
-  dictionary["SIGTERM"] = EXIT_CODE;
-  dictionary["x"]       = EXIT_CODE;
-  dictionary["X"]       = EXIT_CODE;
-  dictionary["h"]       = HELP;
-  dictionary["Up"]      = UP;
-  dictionary["Down"]    = DOWN;
-  dictionary["Right"]   = FORWARD;
-  dictionary["Left"]    = BACK;
+  dictionary[ReadKB::Key::Esc]              = EXIT_CODE;
+  dictionary[static_cast<ReadKB::Key>('x')] = EXIT_CODE;
+  dictionary[static_cast<ReadKB::Key>('X')] = EXIT_CODE;
+  dictionary[static_cast<ReadKB::Key>('h')] = HELP;
+  dictionary[ReadKB::Key::Up]               = UP;
+  dictionary[ReadKB::Key::Down]             = DOWN;
+  dictionary[ReadKB::Key::Right]            = FORWARD;
+  dictionary[ReadKB::Key::Left]             = BACK;
 
   return dictionary;
 }
