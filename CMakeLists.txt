@@ -7,9 +7,9 @@
 cmake_minimum_required(VERSION 3.9)
 
 project(read-kb
-        VERSION 0.1.0
-        DESCRIPTION "Single-key keyboard reader for interactive program input"
-        )
+  VERSION 0.1.0
+  DESCRIPTION "Single-key keyboard reader for interactive program input"
+)
 
 # Set platform dependent compiler/linker flags
 if (MSVC)
@@ -24,26 +24,14 @@ else()
   add_compile_options(-Werror)
 endif()
 
-add_subdirectory(app)
-
-install(PROGRAMS src/read-kb.sh
-        DESTINATION bin
-        RENAME "${PROJECT_NAME}"
-        )
-
-# C++ library to interact with the read-kb executable
-add_library(libread-kb STATIC
-            src/libread-kb.cpp
-            )
-
-target_include_directories(libread-kb PUBLIC
-        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/read-kb>
-        $<INSTALL_INTERFACE:include/read-kb>  # <prefix>/include/read-kb
-      )
-
-add_subdirectory(examples)
-
 # Enable tests to be added in subdirectories
 include(CTest)
 
-add_subdirectory(test/src)
+# Main Executable
+add_subdirectory(app)
+
+# Libraries
+add_subdirectory(lib/read-kb)
+
+# Examples
+add_subdirectory(examples)

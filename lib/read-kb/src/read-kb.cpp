@@ -5,7 +5,7 @@
  * Copyright (c) 2023, Jeremy Goossen jeremyg995@gmail.com
  */
 
-#include "libread-kb.h"
+#include "read-kb.h"
 
 #include <termios.h>
 #include <poll.h>

@@ -5,7 +5,7 @@
  * Copyright (c) 2023, Jeremy Goossen jeremyg995@gmail.com
  */
 
-#include "libread-kb.h"
+#include "read-kb.h"
 
 #include <fcntl.h>
 #include <unistd.h>
@@ -134,7 +134,7 @@ int main() {
 
 
   // Load test data set
-  std::ifstream datafile("../../../test/res/input.txt");
+  std::ifstream datafile("input.txt");
   std::vector<std::pair<std::string, std::string>> data;
   errorIf(!datafile.is_open(), "open data");
   std::string line;
