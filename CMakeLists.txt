@@ -11,6 +11,14 @@ project(read-kb
   DESCRIPTION "Single-key keyboard reader for interactive program input"
 )
 
+# Set platform independent compiler/linker flags
+#   C++ Standard
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED True)
+#   PIC does not depend on absolute address.
+#   True by default for SHARED and MODULE library targets, otherwise False
+set(CMAKE_POSITION_INDEPENDENT_CODE True)
+
 # Set platform dependent compiler/linker flags
 if (MSVC)
   # Warning level 4
