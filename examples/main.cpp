@@ -5,11 +5,12 @@
  * Copyright (c) 2023, Jeremy Goossen jeremyg995@gmail.com
  */
 
-#include "libread-kb.h"
+// Read keynames on standard input and process events
+
+#include "read-kb.h"
 
 #include <iostream>
 #include <map>
-#include <string>
 
 enum COMMANDS {
   NOT_DEFINED,
