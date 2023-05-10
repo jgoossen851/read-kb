@@ -35,13 +35,13 @@ endif()
 # Enable tests to be added in subdirectories
 include(CTest)
 
-# Main Executable
-add_subdirectory(app)
-
 # Libraries
 add_subdirectory(lib/read-kb)
 
-# Examples
 if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
+  # Main Executable
+  add_subdirectory(app)
+
+  # Examples
   add_subdirectory(examples)
 endif()
