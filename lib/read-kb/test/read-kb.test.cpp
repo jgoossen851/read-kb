@@ -22,8 +22,8 @@
 #define ANSI_GRN "\033[32m"
 #define ANSI_RST "\033[0m"
 
-#define U_LA "\u27e8" //!> Left Angle Bracket
-#define U_RA "\u27e9" //!> Right Angle Bracket
+#define U_LA "\u27e8" //!< Left Angle Bracket
+#define U_RA "\u27e9" //!< Right Angle Bracket
 
 // Define error-handling function
 #define errorIf(cond, msg) do { if( cond ) { \
