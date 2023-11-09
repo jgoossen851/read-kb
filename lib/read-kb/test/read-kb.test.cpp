@@ -148,9 +148,9 @@ int main() {
   datafile.close();
 
   // Test reading input from a file (will read to end of file, so temp file used and filled incrementally)
-  const std::string path = "/tmp/read-kb";
-  int fd = open(path.c_str(), O_RDWR | O_TMPFILE, S_IRUSR | S_IWUSR );
-  errorIf(fd == -1, std::string("open temp file: " + path).c_str());
+  const std::string tempdir = "/tmp";
+  int fd = open(tempdir.c_str(), O_RDWR | O_TMPFILE, S_IRUSR | S_IWUSR );
+  errorIf(fd == -1, std::string("open temp in directory: " + tempdir).c_str());
 
   ReadKB kb;
 
