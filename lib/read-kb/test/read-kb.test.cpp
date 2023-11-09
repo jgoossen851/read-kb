@@ -22,8 +22,8 @@
 #define ANSI_GRN "\033[32m"
 #define ANSI_RST "\033[0m"
 
-#define U_LA "\u27e8" //!> Left Angle Bracket
-#define U_RA "\u27e9" //!> Right Angle Bracket
+#define U_LA "\u27e8" //!< Left Angle Bracket
+#define U_RA "\u27e9" //!< Right Angle Bracket
 
 // Define error-handling function
 #define errorIf(cond, msg) do { if( cond ) { \
@@ -148,9 +148,9 @@ int main() {
   datafile.close();
 
   // Test reading input from a file (will read to end of file, so temp file used and filled incrementally)
-  char path[] = "/tmp/read-kb";
-  int fd = open(path, O_RDWR | O_TMPFILE, S_IRUSR | S_IWUSR );
-  errorIf(fd == -1, "open temp");
+  const std::string tempdir = "/tmp";
+  int fd = open(tempdir.c_str(), O_RDWR | O_TMPFILE, S_IRUSR | S_IWUSR );
+  errorIf(fd == -1, std::string("open temp in directory: " + tempdir).c_str());
 
   ReadKB kb;
 
